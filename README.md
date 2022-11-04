@@ -37,7 +37,7 @@
 
 ```diff
 + Download the repository in zip format and import it on your victim machine
-+ After unzipped it run on a powershell console:  ". \ Invoke-WinFlesher.ps1"
++ After unzipped it run on a powershell console:  ". .\ Invoke-WinFlesher.ps1"
 - WinFlesher was created to be scalable and implementable with more TTP and MITRE modules
 - We are looking for collaborators!
 ```
