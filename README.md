@@ -1,8 +1,7 @@
 # WinFlesher
 WINFLESHER v0.1.0.5 - MITRE EXPLOITATION FRAMEWORK
 
-<#
-.SYNOPSIS
+
     WINFLESHER v0.1.0.5 
     MITRE EXPLOITATION FRAMEWORK  
     Written by: Alessandro 'mindsflee' Salzano 
@@ -12,10 +11,11 @@ WINFLESHER v0.1.0.5 - MITRE EXPLOITATION FRAMEWORK
     that can be downloaded here:                                    
     https://opensource.org/licenses/CDDL-1.0  
  
-.DESCRIPTION
-    Get-WinFlesher is a post exploitation framework for windows written in powershell. 
+
+    Invoke-WinFlesher is a post exploitation framework for windows written in powershell. 
     It was created by adapting the exploitation techniques to MITRE and it was meant to be modular.
-.EXAMPLE
+
+
     PS C:\> . .\Invoke-WinFlesher.ps1
     PS C:\> WFL-check-T1574.009
      [+] WARNING: this system is most likely vulnerable to Path Interception by Unquoted Path!
@@ -26,7 +26,7 @@ WINFLESHER v0.1.0.5 - MITRE EXPLOITATION FRAMEWORK
     StartName   : LocalSystem
     StartMode   : Auto
     State       : Stopped
-#>
+
 
 
 
