@@ -14,9 +14,9 @@
     Written by: Alessandro 'mindsflee' Salzano 
     https://github.com/mindsflee                
                                                                                                                                       
-    It is released under Common Development and Distribution License 1.0 
+    It is released under  GNU GENERAL PUBLIC LICENSE
     that can be downloaded here:                                    
-    https://opensource.org/licenses/CDDL-1.0  
+    https://github.com/mindsflee/WinFlesher/blob/main/LICENSE
  
 
     Invoke-WinFlesher is a post exploitation framework for windows written in powershell. 
