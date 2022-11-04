@@ -3,8 +3,6 @@
   <img src="https://user-images.githubusercontent.com/61688412/199962640-950f21fe-f929-42f5-ae4b-5e4787a9f1d3.png" alt="WinFlesher"/>
 </p>
 
-WINFLESHER v0.1.0.5 - MITRE EXPLOITATION FRAMEWORK
-
 
     WINFLESHER v0.1.0.5 
     MITRE EXPLOITATION FRAMEWORK  
@@ -31,9 +29,12 @@ WINFLESHER v0.1.0.5 - MITRE EXPLOITATION FRAMEWORK
     StartMode   : Auto
     State       : Stopped
 
-
-
-
+```diff
++ Download the repository in zip format and import it on your victim machine
++ After unzipped it run on a powershell console:  ". \ Invoke-WinFlesher.ps1"
+- WinFlesher was created to be scalable and implementable with more TTP and MITRE modules
+- We are looking for collaborators!
+```
 https://user-images.githubusercontent.com/61688412/199961907-ee8573c5-4373-442e-a072-421917550949.mp4
 
 
