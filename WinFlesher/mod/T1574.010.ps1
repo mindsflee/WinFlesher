@@ -2,6 +2,17 @@
 
 function WFL-check-T1574.010 {
 
+        $FolderName = ".\lib\tmp\"
+             if (Test-Path $FolderName) {
+             }
+             else
+             {
+
+        #Create TMP directory if not exists
+        New-Item $FolderName -ItemType Directory
+
+               }
+
     Get-WmiObject win32_service | ? { $_.StartName -eq 'LocalSystem' } | ? { $_.State -eq 'Running' } | Select-Object PathName | Out-File -FilePath .\lib\tmp\00001.winfl
     $file = ".\lib\tmp\00001.winfl"
             (gc $file | Select-Object -Skip 3) | sc $file
