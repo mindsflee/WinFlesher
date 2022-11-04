@@ -5,12 +5,12 @@
     Written by: Alessandro 'mindsflee' Salzano 
     https://github.com/mindsflee                
                                                                                                                                       
-    It is released under Common Development and Distribution License 1.0 
+    It is released under  GNU GENERAL PUBLIC LICENSE
     that can be downloaded here:                                    
-    https://opensource.org/licenses/CDDL-1.0  
+    https://github.com/mindsflee/WinFlesher/blob/main/LICENSE
  
 .DESCRIPTION
-    Get-WinFlesher is a post exploitation framework for windows written in powershell. 
+    Invoke-WinFlesher is a post exploitation framework for windows written in powershell. 
     It was created by adapting the exploitation techniques to MITRE and it was meant to be modular.
 .EXAMPLE
     PS C:\> . .\Invoke-WinFlesher.ps1
@@ -44,14 +44,9 @@ Import-Module ./mod/T1555.003.ps1 -Scope Local
 Import-Module ./mod/T1003.001.ps1 -Scope Local
 Import-Module ./mod/T1574.011.ps1 -Scope Local
 Import-Module ./mod/T1548.004.ps1 -Scope Local
-<#
-#>
-<#
-$mod = "./mod/"
-write-host $mod
-Get-ChildItem ($mod + "*.ps1") | ForEach-Object {& (Join-Path $mod $_.Name)} | Out-Null
-#>
-#clear-host
+
+
+
 
 function Menu {
     $Host.UI.RawUI.ForegroundColor = 'Red'
