@@ -5,7 +5,7 @@
     Written by: Alessandro 'mindsflee' Salzano 
     https://github.com/mindsflee                
                                                                                                                                       
-    It is released under  GNU GENERAL PUBLIC LICENSE
+    It is released under GNU GENERAL PUBLIC LICENSE
     that can be downloaded here:                                    
     https://github.com/mindsflee/WinFlesher/blob/main/LICENSE
  
