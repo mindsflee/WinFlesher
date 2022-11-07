@@ -8,7 +8,7 @@
   <img src="https://user-images.githubusercontent.com/61688412/199967424-587f3a2f-e299-4f1d-ac55-fb3c2c25a946.png" alt="WinFlesher" width=40% height=40%/>
 </p>
 
-
+It is not a normal and boring enumeration tool! The idea is to automate the TTP exploitation
 
     WINFLESHER v0.1.0.5 
     MITRE EXPLOITATION FRAMEWORK  
