@@ -26,6 +26,8 @@ WinFlesher offers a modular, telemetry-based approach to risk management:
 
 ## Installation
 
+WinFlesher can run on either a client or a server operating system, as long as the machine is domain-joined and has local administrator privileges to install dependencies and Active Directory modules. 
+
 The quickest way to get started is to download the entire repository as a ZIP archive and extract it locally:
 
 1.  Download the repository by clicking the **"Download ZIP"** button on the main GitHub page.
@@ -56,5 +58,5 @@ To fully leverage WinFlesher's capabilities (especially for the Active Directory
 
 To start the framework, open a PowerShell console (running as Administrator is recommended for full telemetry gathering), navigate to the root directory, and simply execute:
 
-```powershell
-. .\Invoke-winflesher.ps1
+   ```powershell
+   . .\Invoke-winflesher.ps1
