@@ -58,7 +58,7 @@ WinFlesher offers a modular, telemetry-based approach to risk management:
 </p>
 
 <p align="center">
-  <img src="https://github.com/mindsflee/WinFlesher/blob/main/Assets/Images/Modules.png" alt="WinFlesher Logo" width="1000" />
+  <img src="https://github.com/mindsflee/WinFlesher/blob/main/Assets/Images/Remediation.png" alt="WinFlesher Logo" width="1000" />
 </p>
 
 ---
