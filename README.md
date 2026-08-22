@@ -73,6 +73,7 @@ The quickest way to get started is to download the entire repository as a ZIP ar
 1. Download the repository by clicking the **"Download ZIP"** button on the main GitHub page.
 2. Extract the ZIP file to a secure folder (e.g., `C:\Tools\WinFlesher`).
 3. **Note:** Ensure that PowerShell script execution is enabled on your system:
+
     ```powershell
     Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope Process
     ```
@@ -86,10 +87,12 @@ To fully leverage WinFlesher's capabilities (especially for the Active Directory
 </div>
 
 *   **Active Directory:**
+
     ```powershell
     Install-WindowsFeature RSAT-AD-PowerShell
     ```
 *   **Microsoft Graph (for Entra ID):**
+
     ```powershell
     Install-Module Microsoft.Graph.Applications -Scope CurrentUser
     ```
@@ -100,7 +103,7 @@ To fully leverage WinFlesher's capabilities (especially for the Active Directory
 
 <div align="justify">
 To start the framework, open a PowerShell console (running as Administrator is recommended for full telemetry gathering), navigate to the root directory, and simply execute:
-</div> </br>
+</div>
 
 ```powershell
 . .\Invoke-Winflesher.ps1
