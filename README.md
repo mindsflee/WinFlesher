@@ -6,7 +6,7 @@
 
 <div align="center">
 
-*Like PingCastle went out for drinks with Bloodhound, and they actually decided to get some work done. 🍷*
+*Like PingCastle went out for drinks with Bloodhound, and they actually decided to get some work done.*🍷
 
 </div>
 
