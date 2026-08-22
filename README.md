@@ -99,3 +99,5 @@ To start the framework, open a PowerShell console (running as Administrator is r
 
    ```powershell
    . .\Invoke-winflesher.ps1
+   ```
+Once the execution is complete, you can choose whether to directly export the results into multiple formats (HTML, CSV, or JSON) or launch the dedicated WinForm graphical user interface to review the findings.
