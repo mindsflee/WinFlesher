@@ -28,6 +28,18 @@ WinFlesher offers a modular, telemetry-based approach to risk management:
 *   **Remediation Support:** Integrated practical guides and resolution scripts for each detected vulnerability.
 *   **Modern GUI:** Dedicated graphical interface for rapid management and an intuitive visualization of the security score.
 
+<p align="center">
+  <img src="https://github.com/mindsflee/WinFlesher/blob/main/Assets/Images/Dashboard.png" alt="WinFlesher Logo" width="1000" />
+</p>
+
+<p align="center">
+  <img src="https://github.com/mindsflee/WinFlesher/blob/main/Assets/Images/Findings.png" alt="WinFlesher Logo" width="1000" />
+</p>
+
+https://github.com/mindsflee/WinFlesher/blob/main/Assets/Images/Module_Details.png
+https://github.com/mindsflee/WinFlesher/blob/main/Assets/Images/Attack_Paths.png
+https://github.com/mindsflee/WinFlesher/blob/main/Assets/Images/Modules.png
+https://github.com/mindsflee/WinFlesher/blob/main/Assets/Images/Remediation.png
 ---
 
 ## Installation
