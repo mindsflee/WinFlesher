@@ -4,9 +4,7 @@
   <img src="assets/winflesher-logo.png" alt="WinFlesher Logo" width="200" />
 </p>
 
-
 > *WinFlesher: Like PingCastle went out for drinks with Bloodhound, and they actually decided to get some work done. 🍷*
-
 
 **WinFlesher** is an advanced attack surface security assessment framework designed to analyze, evaluate, and report on security postures, attack paths, and remediation strategies in complex environments.
 
@@ -57,45 +55,3 @@ To start the framework, open a PowerShell console (running as Administrator is r
 
 ```powershell
 . .\Invoke-winflesher.ps1
-
-
-## Features Preview
-
-### Main Dashboard (GUI)
-
-<p align="center">
-  <img src="assets/winflesher-logo.png" alt="WinFlesher Logo" width="200" />
-</p>
-
-### HTML Report Dashboard (GUI)
-
-<p align="center">
-  <img src="assets/winflesher-logo.png" alt="WinFlesher Logo" width="200" />
-</p>
-
-
-### Attack Paths Analysis
-
-<p align="center">
-  <img src="assets/winflesher-logo.png" alt="WinFlesher Logo" width="200" />
-</p>
-
-
----
-
-## Component Structure
-
-*   `Invoke-winflesher.ps1`: Main execution script and entry point.
-*   `AttackPaths-Engine.ps1`: Attack paths correlation and logic engine.
-*   `Gui.ps1`: Graphical user interface module.
-*   `remediation.ps1`: Remediation guide generation engine.
-*   `Modules`: Directory containing all the individual check and discovery scripts.
-
----
-
-## Author
-
-**Alessandro Salzano** (mindsflee)  
-
----
-*Disclaimer: This project is intended exclusively for authorized, ethical security assessments and educational purposes.*
