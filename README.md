@@ -1,7 +1,7 @@
 # WinFlesher: Attack Surface Security Framework
 
 <p align="center">
-  <img src="Assets/Logo/winflesher-logo.png" alt="WinFlesher Logo" width="200" />
+  <img src="https://github.com/mindsflee/WinFlesher/blob/main/Assets/Logo/winflesher_logo.png" alt="WinFlesher Logo" width="200" />
 </p>
 
 > *WinFlesher: Like PingCastle went out for drinks with Bloodhound, and they actually decided to get some work done. 🍷*
