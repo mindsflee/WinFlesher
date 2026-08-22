@@ -98,6 +98,6 @@ To fully leverage WinFlesher's capabilities (especially for the Active Directory
 To start the framework, open a PowerShell console (running as Administrator is recommended for full telemetry gathering), navigate to the root directory, and simply execute:
 
    ```powershell
-   . .\Invoke-winflesher.ps1
+   . .\Invoke-Winflesher.ps1
    ```
 Once the execution is complete, you can choose whether to directly export the results into multiple formats (HTML, CSV, or JSON) or launch the dedicated WinForm graphical user interface to review the findings.
