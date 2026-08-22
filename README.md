@@ -4,7 +4,11 @@
   <img src="https://github.com/mindsflee/WinFlesher/blob/main/Assets/Logo/winflesher_logo.png" alt="WinFlesher Logo" width="1000" />
 </p>
 
+<div align="center">
+
 > *Like PingCastle went out for drinks with Bloodhound, and they actually decided to get some work done. 🍷*
+
+</div>
 
 **WinFlesher** is an advanced attack surface security assessment framework designed to analyze, evaluate, and report on security postures, attack paths, and remediation strategies in complex environments.
 
