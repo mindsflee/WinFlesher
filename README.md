@@ -85,7 +85,8 @@ The quickest way to get started is to download the entire repository as a ZIP ar
 To fully leverage WinFlesher's capabilities (especially for the Active Directory and Cloud components), ensure you have the following modules installed:
 </div>
 
-*   **Active Directory:** </br>
+*   **Active Directory:**
+  </br>
     ```powershell
     Install-WindowsFeature RSAT-AD-PowerShell
     ```
