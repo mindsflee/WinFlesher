@@ -38,7 +38,8 @@ function Write-WFLLog {
         "DISCOVERY" { $Color = "Yellow" }
     }
 
-    Write-Host ("[{0}] [{1}] {2}" -f (Get-Date -Format "HH:mm:ss"), $Level, $Message) -ForegroundColor $Color
+    $Timestamp = Get-Date -Format "HH:mm:ss"
+	Write-Host "[$Timestamp] [$Level] $Message" -ForegroundColor $Color
 }
 
 
