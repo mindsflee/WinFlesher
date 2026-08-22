@@ -103,7 +103,7 @@ To fully leverage WinFlesher's capabilities (especially for the Active Directory
 
 <div align="justify">
 To start the framework, open a PowerShell console (running as Administrator is recommended for full telemetry gathering), navigate to the root directory, and simply execute:
-</div>
+</div> </br>
 
 ```powershell
 . .\Invoke-Winflesher.ps1
