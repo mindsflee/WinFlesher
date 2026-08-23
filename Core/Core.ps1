@@ -521,9 +521,9 @@ function Get-WFLScore {
     {
         switch($Finding.Severity)
         {
-            "Critical" { $Score -= 10 }
-            "High"     { $Score -= 5 }
-            "Medium"   { $Score -= 2 }
+            "Critical" { $Score -= 5 }
+            "High"     { $Score -= 2.5 }
+            "Medium"   { $Score -= 0.50 }
             "Low"      { $Score -= 0.25 }
         }
     }
