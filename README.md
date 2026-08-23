@@ -75,7 +75,7 @@ The quickest way to get started is to download the entire repository as a ZIP ar
 3. **Note:** Ensure that PowerShell script execution is enabled on your system:
 
     ```powershell
-    Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope Process
+    Set-ExecutionPolicy Bypass -Scope Process -Force
     ```
 
 ---
