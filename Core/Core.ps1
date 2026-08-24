@@ -43,6 +43,28 @@ function Write-WFLLog {
 	Write-Host "[$Timestamp] [$Level] $Message" -ForegroundColor $Color
 }
 
+function Get-WFLUpdateInfo {
+
+    try {
+
+        $CurrentVersion = [version]$Global:WinFlesher.Version
+
+        $Info = Invoke-RestMethod `
+            -Uri "https://raw.githubusercontent.com/mindsflee/WinFlesher/main/version.json"
+
+        $RemoteVersion = [version]$Info.Version
+
+        [PSCustomObject]@{
+            CurrentVersion = $CurrentVersion
+            RemoteVersion  = $RemoteVersion
+            UpdateAvailable = ($RemoteVersion -gt $CurrentVersion)
+            ZipUrl         = $Info.ZipUrl
+        }
+    }
+    catch {
+        return $null
+    }
+}
 
 function Add-WFLFinding {
 
