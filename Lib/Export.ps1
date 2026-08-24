@@ -82,25 +82,36 @@ function Export-WFLReportHtml {
    
     $DetailsFullHtml = "<div class='details-grid'>"
     foreach ($Key in ($Global:WinFlesher.Details.Keys | Sort-Object)) {
-        
-    
         $Items = @($Global:WinFlesher.Details[$Key])
         if ($Items.Count -eq 0) { continue } 
+
+        $visibleItems = $Items | Select-Object -First 3
+        $hiddenItems  = $Items | Select-Object -Skip 3
 
         $DetailsFullHtml += @"
         <div class='card detail-card'>
             <h3>$Key</h3>
-            <ul>
+            <ul class='detail-list'>
 "@
-        foreach ($Item in $Items) {
+        foreach ($Item in $visibleItems) {
             $content = if ($Item -is [string]) { $Item } else { ($Item | Out-String).Trim() }
             $DetailsFullHtml += "<li>$($content -replace '\n','<br>')</li>"
         }
-        $DetailsFullHtml += "</ul></div>"
+        $DetailsFullHtml += "</ul>"
+
+        if ($hiddenItems.Count -gt 0) {
+            $DetailsFullHtml += "<details class='detail-more-container'><summary class='more-btn'>More ($($hiddenItems.Count) items)...</summary><ul class='detail-list' style='margin-top: 8px;'>"
+            foreach ($Item in $hiddenItems) {
+                $content = if ($Item -is [string]) { $Item } else { ($Item | Out-String).Trim() }
+                $DetailsFullHtml += "<li>$($content -replace '\n','<br>')</li>"
+            }
+            $DetailsFullHtml += "</ul></details>"
+        }
+
+        $DetailsFullHtml += "</div>"
     }
     $DetailsFullHtml += "</div>"
   
-
 
     Write-Verbose "Generating Remediation and Attack Path sections..."
     
@@ -149,7 +160,7 @@ function Export-WFLReportHtml {
 
     $HealthVal = [math]::Max(0, [math]::Min(100, [double]$Score.Score))
 
-    if ($HealthVal -le 20)     { $ScoreColor = "#ef4444" }
+    if ($HealthVal -le 20)      { $ScoreColor = "#ef4444" }
     elseif ($HealthVal -le 40) { $ScoreColor = "#f97316" }
     elseif ($HealthVal -le 60) { $ScoreColor = "#eab308" }
     elseif ($HealthVal -le 80) { $ScoreColor = "#3b82f6" }
@@ -378,7 +389,7 @@ tr:hover {
 }
 
 .details-grid {
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
     display: grid;
     gap: 16px;
     margin-top: 20px;
@@ -386,6 +397,8 @@ tr:hover {
 
 .detail-card {
     padding: 16px;
+    word-break: break-word;
+    overflow-wrap: break-word;
 }
 
 .detail-card h3 {
@@ -396,7 +409,7 @@ tr:hover {
     padding-bottom: 8px;
 }
 
-.detail-card ul {
+.detail-list {
     margin: 0;
     padding-left: 18px;
     font-size: 12px;
@@ -406,15 +419,40 @@ tr:hover {
 
 .detail-card li {
     margin-bottom: 6px;
+    word-break: break-word;
+}
+
+details.detail-more-container {
+    margin-top: 10px;
+}
+
+summary.more-btn {
+    display: inline-block;
+    color: #38bdf8;
+    background: rgba(56, 189, 248, 0.1);
+    border: 1px solid rgba(56, 189, 248, 0.3);
+    padding: 4px 10px;
+    font-size: 11px;
+    font-weight: 600;
+    border-radius: 6px;
+    cursor: pointer;
+    outline: none;
+    user-select: none;
+    transition: background 0.2s;
+}
+
+summary.more-btn:hover {
+    background: rgba(56, 189, 248, 0.2);
+}
+
+details[open] summary.more-btn {
+    margin-bottom: 8px;
 }
 
 pre {
     white-space: pre-wrap;        
     word-wrap: break-word;
     font-family: 'Consolas', 'Monaco', monospace;
-}
-
-    margin-bottom: 40px;
 }
 </style>
 </head>
