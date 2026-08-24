@@ -53,26 +53,60 @@ Add-WindowsCapability -Online -Name Rsat.ActiveDirectory.DS-LDS.Tools~~~~0.0.1.0
     . "$BasePath\Core\Gui.ps1"
     Write-Host "[OK] PowerShell files loaded" -ForegroundColor Green
     
-    try {
-        $UpdateInfo = Get-WFLUpdateInfo
+    #
+    # AUTOMATIC UPDATE CHECK
+    #
 
-        if ($UpdateInfo) {
+    $UpdateInfo = Get-WFLUpdateInfo
+
+    if ($UpdateInfo) {
+        Write-Host ""
+        Write-Host "[VERSION] Current: $($UpdateInfo.CurrentVersion)" -ForegroundColor Gray
+
+        if ($UpdateInfo.UpdateAvailable) {
+            Write-Host "[UPDATE] New version available: $($UpdateInfo.RemoteVersion)" -ForegroundColor Yellow
+
+            if ($UpdateInfo.ReleaseDate) {
+                Write-Host "[UPDATE] Release date: $($UpdateInfo.ReleaseDate)" -ForegroundColor Gray
+            }
+
+            if ($UpdateInfo.ReleaseNotes) {
+                Write-Host "[UPDATE] $($UpdateInfo.ReleaseNotes)" -ForegroundColor Gray
+            }
 
             Write-Host ""
-            Write-Host "[VERSION] Current: $($UpdateInfo.CurrentVersion)" -ForegroundColor Gray
 
-            if ($UpdateInfo.UpdateAvailable) {
-                Write-Host "[UPDATE] New version available: $($UpdateInfo.RemoteVersion)" -ForegroundColor Yellow
-            }
-            else {
-                Write-Host "[OK] WinFlesher is up to date" -ForegroundColor Green
+            $UpdateChoice = Read-Host "Download and install the update now? [Y/N]"
+
+            if ($UpdateChoice -match "^(Y|YES|S|SI)$") {
+                Write-Host ""
+                Write-Host "[*] Starting WinFlesher update..." -ForegroundColor Cyan
+
+                $UpdateResult = Update-WFL `
+                    -BasePath $BasePath `
+                    -UpdateInfo $UpdateInfo
+
+                Write-Host ""
+
+                if ($UpdateResult) {
+                    Write-Host "[OK] Update completed successfully." -ForegroundColor Green
+                    Write-Host "[*] WinFlesher must now be restarted." -ForegroundColor Yellow
+                }
+                else {
+                    Write-Host "[ERROR] Update was not completed." -ForegroundColor Red
+                    Write-Host "[*] Check the messages above and the Backup folder." -ForegroundColor Yellow
+                }
+
+                return
             }
 
-            Write-Host ""
+            Write-Host "[*] Update skipped. Continuing with version $($UpdateInfo.CurrentVersion)." -ForegroundColor Yellow
         }
-    }
-    catch {
-        Write-Host "[WARN] Update check failed" -ForegroundColor Yellow
+        else {
+            Write-Host "[OK] WinFlesher is up to date." -ForegroundColor Green
+        }
+
+        Write-Host ""
     }
     
     Write-Host ""
@@ -81,9 +115,54 @@ Add-WindowsCapability -Online -Name Rsat.ActiveDirectory.DS-LDS.Tools~~~~0.0.1.0
     Write-Host "==================================" -ForegroundColor Cyan
     Write-Host " [1] Launch Interactive GUI" -ForegroundColor White
     Write-Host " [2] Run Full Assessment & Export HTML/CSV/JSON (Headless)" -ForegroundColor White
+    Write-Host " [3] Update WinFlesher" -ForegroundColor White
     Write-Host ""
     
-    $Choice = Read-Host "Select an option [1-2]"
+    $Choice = Read-Host "Select an option [1-3]"
+    
+    if ($Choice -eq "3") {
+        Write-Host ""
+        Write-Host "[*] Checking for updates..." -ForegroundColor Cyan
+
+        $ManualUpdateInfo = Get-WFLUpdateInfo
+
+        if (-not $ManualUpdateInfo) {
+            Write-Host "[ERROR] Unable to retrieve update information." -ForegroundColor Red
+            return
+        }
+
+        if (-not $ManualUpdateInfo.UpdateAvailable) {
+            Write-Host "[OK] WinFlesher is already up to date." -ForegroundColor Green
+            return
+        }
+
+        Write-Host "[UPDATE] Current version: $($ManualUpdateInfo.CurrentVersion)" -ForegroundColor Gray
+        Write-Host "[UPDATE] New version: $($ManualUpdateInfo.RemoteVersion)" -ForegroundColor Yellow
+        Write-Host ""
+
+        $ManualChoice = Read-Host "Download and install the update now? [Y/N]"
+
+        if ($ManualChoice -notmatch "^(Y|YES|S|SI)$") {
+            Write-Host "[*] Update cancelled." -ForegroundColor Yellow
+            return
+        }
+
+        $UpdateResult = Update-WFL `
+            -BasePath $BasePath `
+            -UpdateInfo $ManualUpdateInfo
+
+        Write-Host ""
+
+        if ($UpdateResult) {
+            Write-Host "[OK] Update completed successfully." -ForegroundColor Green
+            Write-Host "[*] Restart WinFlesher to load the new version." -ForegroundColor Yellow
+        }
+        else {
+            Write-Host "[ERROR] Update was not completed." -ForegroundColor Red
+        }
+
+        return
+    }
 
     if ($Choice -eq "2") {
         Write-Host "[*] Starting automated assessment..." -ForegroundColor Cyan
