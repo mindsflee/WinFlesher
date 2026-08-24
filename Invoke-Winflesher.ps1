@@ -52,7 +52,29 @@ Add-WindowsCapability -Online -Name Rsat.ActiveDirectory.DS-LDS.Tools~~~~0.0.1.0
     . "$BasePath\Lib\Export.ps1"
     . "$BasePath\Core\Gui.ps1"
     Write-Host "[OK] PowerShell files loaded" -ForegroundColor Green
+    
+    try {
+        $UpdateInfo = Get-WFLUpdateInfo
 
+        if ($UpdateInfo) {
+
+            Write-Host ""
+            Write-Host "[VERSION] Current: $($UpdateInfo.CurrentVersion)" -ForegroundColor Gray
+
+            if ($UpdateInfo.UpdateAvailable) {
+                Write-Host "[UPDATE] New version available: $($UpdateInfo.RemoteVersion)" -ForegroundColor Yellow
+            }
+            else {
+                Write-Host "[OK] WinFlesher is up to date" -ForegroundColor Green
+            }
+
+            Write-Host ""
+        }
+    }
+    catch {
+        Write-Host "[WARN] Update check failed" -ForegroundColor Yellow
+    }
+    
     Write-Host ""
     Write-Host "==================================" -ForegroundColor Cyan
     Write-Host " WINFLESHER RUNTIME MODE" -ForegroundColor Cyan
