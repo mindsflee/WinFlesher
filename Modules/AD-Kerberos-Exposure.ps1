@@ -116,12 +116,12 @@ Set-ADUser -Identity "ServiceAccount" -KerberosEncryptionType AES128,AES256
                     $Exploitability = "Golden Ticket Target"
                     $RiskReasons += "KRBTGT baseline hygiene review"
 
-                    if ($PasswordAgeDays -ge 365) {
+                    if ($PasswordAgeDays -ge 3650) {
                         $Severity = "Critical"
-                        $RiskReasons += "KRBTGT password older than 365 days ($PasswordAgeDays days)"
-                    } elseif ($PasswordAgeDays -ge 180) {
+                        $RiskReasons += "KRBTGT password older than 3650 days ($PasswordAgeDays days)"
+                    } elseif ($PasswordAgeDays -ge 1825) {
                         $Severity = "High"
-                        $RiskReasons += "KRBTGT password older than 180 days ($PasswordAgeDays days)"
+                        $RiskReasons += "KRBTGT password older than 1825 days ($PasswordAgeDays days)"
                     }
 
                     if (-not $HasAES -and $EncTypes -ne 0) {
@@ -188,12 +188,12 @@ Set-ADUser -Identity "ServiceAccount" -KerberosEncryptionType AES128,AES256
                             $Severity = "High"
                             $Exploitability = "Likely"
                             $RiskReasons += "Password Never Expires"
-                        } elseif ($PasswordAgeDays -ge 365) {
+                        } elseif ($PasswordAgeDays -ge 3650) {
                             $Severity = "High"
                             $Exploitability = "Likely"
-                            $RiskReasons += "Password older than 365 days ($PasswordAgeDays days)"
-                        } elseif ($PasswordAgeDays -ge 180) {
-                            $RiskReasons += "Password older than 180 days ($PasswordAgeDays days)"
+                            $RiskReasons += "Password older than 3650 days ($PasswordAgeDays days)"
+                        } elseif ($PasswordAgeDays -ge 1825) {
+                            $RiskReasons += "Password older than 1825 days ($PasswordAgeDays days)"
                         }
                     }
                 }

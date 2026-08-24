@@ -47,18 +47,18 @@ Set-ADAccountPassword -Identity "krbtgt" -NewPassword ($SecurePassword)
                 $GoldenRisk = "Medium"
                 $RiskFactors = @()
 
-                if ($DaysOld -gt 180) {
+                if ($DaysOld -gt 1825) {
                     $GoldenRisk = "High"
-                    $RiskFactors += "KRBTGT password older than 180 days ($DaysOld days)"
+                    $RiskFactors += "KRBTGT password older than 1825 days ($DaysOld days)"
                 }
-                if ($DaysOld -gt 365) {
+                if ($DaysOld -gt 3650) {
                     $GoldenRisk = "Critical"
-                    $RiskFactors += "KRBTGT password older than 365 days ($DaysOld days)"
+                    $RiskFactors += "KRBTGT password older than 3650 days ($DaysOld days)"
                 }
 
                 if (-not $HasAES -and $EncTypes -ne 0) {
                     $RiskFactors += "KRBTGT does not explicitly enforce AES encryption (RC4 enabled)"
-                    if ($GoldenRisk -ne "Critical") { $GoldenRisk = "High" }
+                    if ($GoldenRisk -ne "High") { $GoldenRisk = "High" }
                 }
 
                 if ($RiskFactors.Count -eq 0) {
@@ -106,8 +106,8 @@ Set-ADAccountPassword -Identity "krbtgt" -NewPassword ($SecurePassword)
                     $RiskFactors += "User SPN with Password Never Expires"
                     if ($SilverRisk -eq "Low") { $SilverRisk = "Medium" }
                 }
-                if ($DaysOld -gt 180) {
-                    $RiskFactors += "User SPN password older than 180 days ($DaysOld days)"
+                if ($DaysOld -gt 365) {
+                    $RiskFactors += "User SPN password older than 365 days ($DaysOld days)"
                     $SilverRisk = "High"
                 }
 
