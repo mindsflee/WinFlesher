@@ -13,6 +13,7 @@
 $Global:WinFlesher = @{
     Version   = "2.0.0"
 	BuildDate = "2026-08-24"
+	UpdateUrl = "https://raw.githubusercontent.com/mindsflee/WinFlesher/main/version.json"
     RootPath  = $PSScriptRoot
     Context   = @{}
     Findings  = New-Object System.Collections.ArrayList
@@ -47,18 +48,17 @@ function Get-WFLUpdateInfo {
 
     try {
 
-        $CurrentVersion = [version]$Global:WinFlesher.Version
-
         $Info = Invoke-RestMethod `
-            -Uri "https://raw.githubusercontent.com/mindsflee/WinFlesher/main/version.json"
-
-        $RemoteVersion = [version]$Info.Version
+            -Uri $Global:WinFlesher.UpdateUrl
 
         [PSCustomObject]@{
-            CurrentVersion = $CurrentVersion
-            RemoteVersion  = $RemoteVersion
-            UpdateAvailable = ($RemoteVersion -gt $CurrentVersion)
-            ZipUrl         = $Info.ZipUrl
+            CurrentVersion = [version]$Global:WinFlesher.Version
+            RemoteVersion  = [version]$Info.Version
+            UpdateAvailable = (
+                [version]$Info.Version -gt
+                [version]$Global:WinFlesher.Version
+            )
+            ZipUrl = $Info.ZipUrl
         }
     }
     catch {
