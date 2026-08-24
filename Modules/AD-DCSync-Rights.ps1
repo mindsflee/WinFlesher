@@ -137,7 +137,19 @@
 
         try {
             $DomainDN = (Get-ADDomain -ErrorAction Stop).DistinguishedName
+			
+			
 
+    $KnownReplicationAccounts = @(
+    "MSOL_*"
+    "AAD_*"
+    "*AzureAD*"
+    "*Entra*"
+    "*ADSync*"
+    "*Sync*"
+)
+
+    
             $ReplicationRights = @{
                 "1131f6aa-9c07-11d1-f79f-00c04fc2dcd2" = "Replicating Directory Changes"
                 "1131f6ad-9c07-11d1-f79f-00c04fc2dcd2" = "Replicating Directory Changes All"
@@ -203,9 +215,22 @@
 )
 				
 
-                $RiskSignals = @()
+             $RiskSignals = @()
+$IsMicrosoftSyncAccount = $false
 
-                if (-not $IsTrusted) { $RiskSignals += "NonTrustedPrincipal" }
+foreach ($Pattern in $KnownReplicationAccounts) {
+    if (
+        $Identity -like $Pattern -or
+        $Principal.SamAccountName -like $Pattern
+    ) {
+        $IsMicrosoftSyncAccount = $true
+        break
+    }
+}
+
+if (-not $IsTrusted -and -not $IsMicrosoftSyncAccount) {
+    $RiskSignals += "NonTrustedPrincipal"
+}
                 if ($CanDCSync)      { $RiskSignals += "FullDCSyncCapable" }
 
                 if ($Principal.Resolved) {
@@ -221,14 +246,69 @@
 
                 $EffectiveSeverity = "Info"
 
-                if (-not $IsTrusted) {
-                    if ($CanDCSync) {
-                        $EffectiveSeverity = "Critical"
-                    }
-                    else {
-                        $EffectiveSeverity = "High"
-                    }
-                }
+if ($CanDCSync) {
+
+    if ($IsTrusted) {
+
+        $EffectiveSeverity = "Info"
+        $RiskSignals += "ExpectedReplicationPrincipal"
+
+    }
+    elseif ($IsMicrosoftSyncAccount) {
+
+        $EffectiveSeverity = "Info"
+        $RiskSignals += "ApprovedReplicationAccount"
+
+    }
+    elseif (-not $Principal.Resolved) {
+
+        $EffectiveSeverity = "Medium"
+        $RiskSignals += "NeedsValidation"
+
+    }
+    elseif ($Principal.Enabled -eq "False") {
+
+        $EffectiveSeverity = "Low"
+        $RiskSignals += "DisabledPrincipal"
+
+    }
+    elseif (
+        $Principal.ObjectClass -eq "user" -and
+        $Principal.AdminCount -eq "1"
+    ) {
+
+        $EffectiveSeverity = "Critical"
+        $RiskSignals += "PrivilegedUserDCSync"
+
+    }
+    elseif (
+        $Principal.ObjectClass -eq "user"
+    ) {
+
+        $EffectiveSeverity = "High"
+        $RiskSignals += "UserDCSync"
+
+    }
+    elseif (
+        $Principal.ObjectClass -eq "computer"
+    ) {
+
+        $EffectiveSeverity = "Medium"
+        $RiskSignals += "ComputerDCSync"
+
+    }
+    else {
+
+        $EffectiveSeverity = "High"
+        $RiskSignals += "UnknownObjectType"
+
+    }
+}
+elseif (-not $IsTrusted) {
+
+    $EffectiveSeverity = "Low"
+
+}
 
                 $Results += [PSCustomObject]@{
                     Identity              = $Identity
@@ -268,12 +348,12 @@
 
 if ($MediumRisk.Count -gt 0)
 {
-    $Severity = "High"
+    $Severity = "Medium"
 }
 
 if ($HighRisk.Count -gt 0)
 {
-    $Severity = "Critical"
+    $Severity = "High"
 }
 
 if ($CriticalRisk.Count -gt 0)

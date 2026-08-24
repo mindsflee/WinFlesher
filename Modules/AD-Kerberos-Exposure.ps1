@@ -110,98 +110,214 @@ Set-ADUser -Identity "ServiceAccount" -KerberosEncryptionType AES128,AES256
                 $Category = "Silver Ticket"
 
 
-                if ($IsKrbtgt) {
-                    $Category = "Golden Ticket"
-                    $Severity = "Medium"
-                    $Exploitability = "Golden Ticket Target"
-                    $RiskReasons += "KRBTGT baseline hygiene review"
+              if ($IsKrbtgt) {
 
-                    if ($PasswordAgeDays -ge 3650) {
-                        $Severity = "Critical"
-                        $RiskReasons += "KRBTGT password older than 3650 days ($PasswordAgeDays days)"
-                    } elseif ($PasswordAgeDays -ge 1825) {
-                        $Severity = "High"
-                        $RiskReasons += "KRBTGT password older than 1825 days ($PasswordAgeDays days)"
-                    }
+    $Category = "Golden Ticket Hygiene"
+    $Exploitability = "Conditional"
+    $KerberoastCandidate = $false
+    $Severity = "Info"
 
-                    if (-not $HasAES -and $EncTypes -ne 0) {
-                        $RiskReasons += "RC4 enabled / AES not explicitly enforced"
-                        if ($Severity -ne "Critical") { $Severity = "High" }
-                    }
-                }
-                elseif ($IsComputer) {
-                    if ($DontRequirePreAuth) {
-                        $Severity = "Critical"
-                        $Exploitability = "High"
-                        $RiskReasons += "Computer account with Kerberos Pre-Auth Disabled"
-                    } elseif ($IsPrivileged -and $PasswordNeverExpires) {
-                        $Severity = "Critical"
-                        $Exploitability = "High"
-                        $RiskReasons += "Domain Controller / Privileged Computer with Password Never Expires"
-                    } elseif ($PasswordNeverExpires) {
-                        $Severity = "High"
-                        $Exploitability = "Likely"
-                        $RiskReasons += "Computer account with Password Never Expires"
-                    } else {
-                        $Severity = "Info"
-                        $Exploitability = "Expected computer SPN"
-                        $RiskReasons += "Standard Computer account SPN"
-                    }
-                }
-                elseif ($IsManagedServiceAccount) {
-                    $KerberoastCandidate = $true
-                    $Severity = "Medium"
-                    $Exploitability = "Conditional"
-                    $RiskReasons += "Managed Service Account (gMSA/MSA)"
+    $RiskReasons += "KRBTGT hygiene review"
 
-                    if ($IsPrivileged) {
-                        $Severity = "Critical"
-                        $Exploitability = "Likely"
-                        $RiskReasons += "Privileged MSA (adminCount=1)"
-                    } elseif ($PasswordNeverExpires) {
-                        $Severity = "High"
-                        $Exploitability = "Likely"
-                        $RiskReasons += "MSA with Password Never Expires override"
-                    }
-                }
-                elseif ($IsUser) {
-                    $KerberoastCandidate = $true
+    if ($PasswordAgeDays -ge 3650) {
+        $Severity = "Critical"
+        $Exploitability = "Material exposure"
+        $RiskReasons += "KRBTGT password older than 3650 days ($PasswordAgeDays days)"
+    }
+    elseif ($PasswordAgeDays -ge 1825) {
+        $Severity = "High"
+        $Exploitability = "Elevated exposure"
+        $RiskReasons += "KRBTGT password older than 1825 days ($PasswordAgeDays days)"
+    }
+    elseif ($PasswordAgeDays -ge 730) {
+        $Severity = "Medium"
+        $Exploitability = "Hygiene gap"
+        $RiskReasons += "KRBTGT password older than 730 days ($PasswordAgeDays days)"
+    }
+    else {
+        $RiskReasons += "KRBTGT password age does not exceed configured risk thresholds"
+    }
 
-                    if (-not $Enabled) {
-                        $Severity = "Low"
-                        $Exploitability = "Not directly exploitable"
-                        $RiskReasons += "User account disabled"
-                    } else {
-                        $Severity = "Medium"
-                        $Exploitability = "Potential"
-                        $RiskReasons += "Enabled user SPN account"
+    if ($EncTypes -eq 0) {
+        $RiskReasons += "Encryption types not explicitly configured; effective domain behavior must be validated"
+    }
+    elseif (-not $HasAES) {
+        $RiskReasons += "AES not enabled in msDS-SupportedEncryptionTypes"
 
-                        if ($IsPrivileged) {
-                            $Severity = "Critical"
-                            $Exploitability = "Likely"
-                            $RiskReasons += "Privileged Account Target (adminCount=1)"
-                        } elseif ($PasswordNeverExpires -and (-not $HasAES -and $EncTypes -ne 0)) {
-                            $Severity = "Critical"
-                            $Exploitability = "Likely"
-                            $RiskReasons += "User SPN combines Password Never Expires and RC4/Weak Encryption"
-                        } elseif ($PasswordNeverExpires) {
-                            $Severity = "High"
-                            $Exploitability = "Likely"
-                            $RiskReasons += "Password Never Expires"
-                        } elseif ($PasswordAgeDays -ge 3650) {
-                            $Severity = "High"
-                            $Exploitability = "Likely"
-                            $RiskReasons += "Password older than 3650 days ($PasswordAgeDays days)"
-                        } elseif ($PasswordAgeDays -ge 1825) {
-                            $RiskReasons += "Password older than 1825 days ($PasswordAgeDays days)"
-                        }
-                    }
-                }
-                else {
-                    $Severity = "Low"
-                    $Exploitability = "Conditional"
-                    $RiskReasons += "Non-standard SPN object class"
-                }
+        if ($Severity -eq "Info") {
+            $Severity = "Medium"
+        }
+    }
+}
+elseif ($IsComputer) {
+
+    $Category = "Computer Service Principal"
+    $KerberoastCandidate = $false
+    $Severity = "Info"
+    $Exploitability = "Expected computer SPN"
+
+    if (-not $Enabled) {
+        $Severity = "Low"
+        $Exploitability = "Not directly exploitable"
+        $RiskReasons += "Disabled computer account retains SPNs"
+    }
+    elseif ($DontRequirePreAuth) {
+        $Severity = "High"
+        $Exploitability = "Likely"
+        $RiskReasons += "Computer account has Kerberos pre-authentication disabled"
+    }
+    elseif ($IsPrivileged -and $PasswordNeverExpires) {
+        $Severity = "Critical"
+        $Exploitability = "High"
+        $RiskReasons += "Privileged computer or Domain Controller with Password Never Expires"
+    }
+    elseif ($PasswordNeverExpires) {
+        $Severity = "Medium"
+        $Exploitability = "Conditional"
+        $RiskReasons += "Computer account password rotation disabled"
+    }
+    elseif ($IsPrivileged -and $PasswordAgeDays -ge 365) {
+        $Severity = "Medium"
+        $Exploitability = "Conditional"
+        $RiskReasons += "Privileged computer password older than 365 days ($PasswordAgeDays days)"
+    }
+    else {
+        $RiskReasons += "Standard computer account SPN"
+    }
+
+    if ($EncTypes -eq 0) {
+        $RiskReasons += "Encryption types inherited or not explicitly configured"
+    }
+    elseif (-not $HasAES) {
+        $RiskReasons += "AES not explicitly enabled"
+
+        if ($Severity -eq "Info") {
+            $Severity = "Low"
+        }
+    }
+}
+elseif ($IsManagedServiceAccount) {
+
+    $Category = "Managed Service Account"
+    $KerberoastCandidate = $false
+    $Severity = "Info"
+    $Exploitability = "Low"
+
+    $RiskReasons += "Managed Service Account with automatically managed password"
+
+    if (-not $Enabled) {
+        $Severity = "Low"
+        $Exploitability = "Not directly exploitable"
+        $RiskReasons += "Managed Service Account is disabled"
+    }
+    elseif ($DontRequirePreAuth) {
+        $Severity = "High"
+        $Exploitability = "Likely"
+        $RiskReasons += "Kerberos pre-authentication disabled"
+    }
+    elseif ($IsPrivileged -and $EncTypes -ne 0 -and -not $HasAES) {
+        $Severity = "High"
+        $Exploitability = "Conditional"
+        $RiskReasons += "Privileged managed service account without AES enabled"
+    }
+    elseif ($IsPrivileged) {
+        $Severity = "Medium"
+        $Exploitability = "Conditional"
+        $RiskReasons += "Privileged managed service account"
+    }
+    elseif ($EncTypes -ne 0 -and -not $HasAES) {
+        $Severity = "Medium"
+        $Exploitability = "Conditional"
+        $RiskReasons += "Managed service account without AES enabled"
+    }
+    elseif ($EncTypes -eq 0) {
+        $RiskReasons += "Encryption types not explicitly configured"
+    }
+}
+elseif ($IsUser) {
+
+    $Category = "Kerberoastable User SPN"
+    $KerberoastCandidate = $Enabled
+    $Severity = "Info"
+    $Exploitability = "Informational"
+
+    if (-not $Enabled) {
+        $Severity = "Low"
+        $Exploitability = "Not directly exploitable"
+        $RiskReasons += "Disabled user account retains SPNs"
+    }
+    else {
+        $Severity = "Medium"
+        $Exploitability = "Potential"
+        $RiskReasons += "Enabled user account with SPN"
+
+        if ($DontRequirePreAuth) {
+            $Severity = "Critical"
+            $Exploitability = "High"
+            $RiskReasons += "Kerberos pre-authentication disabled"
+            $RiskReasons += "Account is exposed to both AS-REP roasting and Kerberoasting"
+        }
+        elseif (
+            $IsPrivileged -and
+            $PasswordNeverExpires -and
+            $EncTypes -ne 0 -and
+            -not $HasAES
+        ) {
+            $Severity = "Critical"
+            $Exploitability = "Likely"
+            $RiskReasons += "Privileged user SPN with Password Never Expires and no AES"
+        }
+        elseif ($IsPrivileged) {
+            $Severity = "High"
+            $Exploitability = "Likely"
+            $RiskReasons += "Privileged user SPN account"
+        }
+        elseif (
+            $PasswordNeverExpires -and
+            $EncTypes -ne 0 -and
+            -not $HasAES
+        ) {
+            $Severity = "High"
+            $Exploitability = "Likely"
+            $RiskReasons += "Password Never Expires combined with no AES"
+        }
+        elseif ($PasswordNeverExpires) {
+            $Severity = "High"
+            $Exploitability = "Likely"
+            $RiskReasons += "Password Never Expires"
+        }
+        elseif ($PasswordAgeDays -ge 3650) {
+            $Severity = "High"
+            $Exploitability = "Likely"
+            $RiskReasons += "Password older than 3650 days ($PasswordAgeDays days)"
+        }
+        elseif ($PasswordAgeDays -ge 1825) {
+            $Severity = "Medium"
+            $Exploitability = "Potential"
+            $RiskReasons += "Password older than 1825 days ($PasswordAgeDays days)"
+        }
+
+        if ($EncTypes -eq 0) {
+            $RiskReasons += "Encryption types not explicitly configured; weak encryption cannot be confirmed from this attribute alone"
+        }
+        elseif (-not $HasAES) {
+            $RiskReasons += "AES not enabled in msDS-SupportedEncryptionTypes"
+
+            if ($Severity -eq "Medium") {
+                $Severity = "High"
+                $Exploitability = "Likely"
+            }
+        }
+    }
+}
+else {
+
+    $Category = "Non-standard SPN Object"
+    $Severity = "Low"
+    $Exploitability = "Conditional"
+    $KerberoastCandidate = $false
+    $RiskReasons += "Non-standard SPN object class"
+}
 
                 if ($SPNCount -gt 0) {
                     $RiskReasons += "SPNCount=$SPNCount"
@@ -239,9 +355,28 @@ Set-ADUser -Identity "ServiceAccount" -KerberosEncryptionType AES128,AES256
             $ManagedServiceAccountCount = @($Findings | Where-Object { $_.IsManagedServiceAccount }).Count
             $ComputerSPNCount = @($Findings | Where-Object { $_.IsComputer }).Count
             $KerberoastCandidateCount = @($Findings | Where-Object { $_.KerberoastCandidate }).Count
+			$ActionableKerberoastCount = @(
+    $Findings |
+        Where-Object {
+            $_.KerberoastCandidate -and
+            $_.Enabled -and
+            $_.Severity -in @("Critical", "High", "Medium")
+        }
+).Count
             $PrivilegedSPNCount = @($Findings | Where-Object { $_.IsPrivileged }).Count
             $PasswordNeverExpiresCount = @($Findings | Where-Object { $_.PasswordNeverExpires }).Count
-            $OldPasswordCount = @($Findings | Where-Object { $_.PasswordAgeDays -ge 365 }).Count
+            $OldPasswordCount = @(
+    $Findings |
+        Where-Object {
+            $_.Enabled -and
+            (
+                $_.IsUser -or
+                $_.IsManagedServiceAccount
+            ) -and
+            -not $_.IsKrbtgt -and
+            $_.PasswordAgeDays -ge 1825
+        }
+).Count
 
             $CriticalCount = @($Findings | Where-Object { $_.Severity -eq "Critical" }).Count
             $HighCount     = @($Findings | Where-Object { $_.Severity -eq "High" }).Count
@@ -274,7 +409,7 @@ Set-ADUser -Identity "ServiceAccount" -KerberosEncryptionType AES128,AES256
                 -MITRE "T1558.001, T1558.002, T1558.003" `
                 -Tactic "Credential Access" `
                 -Source "AD-Kerberos-Exposure" `
-                -Evidence "SPNObjects=$TotalSPNObjects; KerberoastCandidates=$KerberoastCandidateCount; UserSPNs=$UserSPNCount; ManagedServiceAccounts=$ManagedServiceAccountCount; ComputerSPNs=$ComputerSPNCount; PrivilegedSPN=$PrivilegedSPNCount; PasswordNeverExpires=$PasswordNeverExpiresCount; PasswordAgeOver365Days=$OldPasswordCount; Critical=$CriticalCount; High=$HighCount; Medium=$MediumCount; Low=$LowCount" `
+                -Evidence "SPNObjects=$TotalSPNObjects; ActionableKerberoastCandidates=$ActionableKerberoastCount; UserSPNs=$UserSPNCount; ManagedServiceAccounts=$ManagedServiceAccountCount; ComputerSPNs=$ComputerSPNCount; PrivilegedSPNs=$PrivilegedSPNCount; PasswordNeverExpires=$PasswordNeverExpiresCount; UserOrServicePasswordsOver1825Days=$OldPasswordCount; Critical=$CriticalCount; High=$HighCount; Medium=$MediumCount; Low=$LowCount" `
                 -Recommendation "Review SPN-bearing users, computer objects, and managed service accounts. Prioritize privileged accounts, Password Never Expires accounts, and weak Kerberos encryption settings."
         }
         catch {
