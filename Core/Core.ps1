@@ -43,26 +43,289 @@ function Write-WFLLog {
     $Timestamp = Get-Date -Format "HH:mm:ss"
 	Write-Host "[$Timestamp] [$Level] $Message" -ForegroundColor $Color
 }
-
 function Get-WFLUpdateInfo {
-
     try {
+        if (
+            -not $Global:WinFlesher.UpdateUrl -or
+            [string]::IsNullOrWhiteSpace([string]$Global:WinFlesher.UpdateUrl)
+        ) {
+            throw "WinFlesher UpdateUrl is not configured."
+        }
+
+        $CacheBuster = [DateTimeOffset]::UtcNow.ToUnixTimeSeconds()
+
+        $RequestUri = "{0}?nocache={1}" -f `
+            $Global:WinFlesher.UpdateUrl,
+            $CacheBuster
 
         $Info = Invoke-RestMethod `
-            -Uri $Global:WinFlesher.UpdateUrl
+            -Uri $RequestUri `
+            -UseBasicParsing `
+            -Headers @{
+                "Cache-Control" = "no-cache"
+                "User-Agent"    = "WinFlesher-Updater"
+            }
+
+        $CurrentVersion = [version]$Global:WinFlesher.Version
+        $RemoteVersion  = [version]$Info.Version
 
         [PSCustomObject]@{
-            CurrentVersion = [version]$Global:WinFlesher.Version
-            RemoteVersion  = [version]$Info.Version
-            UpdateAvailable = (
-                [version]$Info.Version -gt
-                [version]$Global:WinFlesher.Version
-            )
-            ZipUrl = $Info.ZipUrl
+            CurrentVersion  = $CurrentVersion
+            RemoteVersion   = $RemoteVersion
+            UpdateAvailable = ($RemoteVersion -gt $CurrentVersion)
+            ReleaseDate     = $Info.ReleaseDate
+            ReleaseNotes    = $Info.ReleaseNotes
+            ZipUrl          = $Info.ZipUrl
         }
     }
     catch {
+        Write-WFLLog `
+            "Update check failed: $($_.Exception.Message)" `
+            "WARN"
+
         return $null
+    }
+}
+
+function Update-WFL {
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory)]
+        [string]$BasePath,
+
+        [Parameter(Mandatory)]
+        [object]$UpdateInfo
+    )
+
+    $TempRoot    = Join-Path $env:TEMP ("WinFlesher_Update_{0}" -f ([guid]::NewGuid().ToString("N")))
+    $TempZip     = Join-Path $TempRoot "WinFlesher_Update.zip"
+    $ExtractPath = Join-Path $TempRoot "Extracted"
+    $BackupStage = Join-Path $TempRoot "BackupStage"
+
+    try {
+        if (-not (Test-Path -LiteralPath $BasePath -PathType Container)) {
+            throw "WinFlesher base path not found: $BasePath"
+        }
+
+        if (-not $UpdateInfo.UpdateAvailable) {
+            Write-WFLLog "WinFlesher is already up to date." "OK"
+            return $false
+        }
+
+        if ([string]::IsNullOrWhiteSpace([string]$UpdateInfo.ZipUrl)) {
+            throw "ZipUrl is missing from version.json."
+        }
+
+        $ZipUri = $null
+
+        if (-not [System.Uri]::TryCreate(
+            [string]$UpdateInfo.ZipUrl,
+            [System.UriKind]::Absolute,
+            [ref]$ZipUri
+        )) {
+            throw "Invalid ZipUrl in version.json."
+        }
+
+        if ($ZipUri.Scheme -ne "https") {
+            throw "The update package must use HTTPS."
+        }
+
+        if ($ZipUri.Host -notin @(
+            "github.com",
+            "codeload.github.com"
+        )) {
+            throw "Update download host is not allowed: $($ZipUri.Host)"
+        }
+
+        Write-WFLLog "Preparing update to version $($UpdateInfo.RemoteVersion)..." "INFO"
+
+        New-Item -ItemType Directory -Path $TempRoot -Force | Out-Null
+        New-Item -ItemType Directory -Path $ExtractPath -Force | Out-Null
+        New-Item -ItemType Directory -Path $BackupStage -Force | Out-Null
+
+        Write-WFLLog "Downloading update package..." "INFO"
+
+        Invoke-WebRequest `
+            -Uri $UpdateInfo.ZipUrl `
+            -OutFile $TempZip `
+            -UseBasicParsing `
+            -ErrorAction Stop
+
+        if (-not (Test-Path -LiteralPath $TempZip -PathType Leaf)) {
+            throw "The update package was not downloaded."
+        }
+
+        if ((Get-Item -LiteralPath $TempZip).Length -eq 0) {
+            throw "The downloaded update package is empty."
+        }
+
+        Write-WFLLog "Extracting update package..." "INFO"
+
+        Expand-Archive `
+            -LiteralPath $TempZip `
+            -DestinationPath $ExtractPath `
+            -Force `
+            -ErrorAction Stop
+
+        $RepoRoot = Get-ChildItem `
+            -LiteralPath $ExtractPath `
+            -Directory `
+            -ErrorAction Stop |
+            Select-Object -First 1
+
+        if (-not $RepoRoot) {
+            throw "Unable to locate the repository root in the update package."
+        }
+
+        $RequiredUpdateFiles = @(
+            (Join-Path $RepoRoot.FullName "Core\Core.ps1"),
+            (Join-Path $RepoRoot.FullName "Lib\Export.ps1"),
+            (Join-Path $RepoRoot.FullName "Invoke-Winflesher.ps1"),
+            (Join-Path $RepoRoot.FullName "version.json")
+        )
+
+        foreach ($RequiredFile in $RequiredUpdateFiles) {
+            if (-not (Test-Path -LiteralPath $RequiredFile -PathType Leaf)) {
+                throw "Invalid update package. Required file not found: $RequiredFile"
+            }
+        }
+
+        $PackageVersionFile = Join-Path $RepoRoot.FullName "version.json"
+
+        try {
+            $PackageVersionInfo = Get-Content `
+                -LiteralPath $PackageVersionFile `
+                -Raw `
+                -ErrorAction Stop |
+                ConvertFrom-Json `
+                    -ErrorAction Stop
+
+            $PackageVersion = [version]$PackageVersionInfo.Version
+        }
+        catch {
+            throw "Unable to validate the version.json contained in the update package: $($_.Exception.Message)"
+        }
+
+        if ($PackageVersion -ne [version]$UpdateInfo.RemoteVersion) {
+            throw "Update package version mismatch. Expected $($UpdateInfo.RemoteVersion), found $PackageVersion."
+        }
+
+        #
+        # BACKUP CREATION
+        # Reports and local backup folders are excluded from the backup package stage.
+        #
+
+        Write-WFLLog "Creating backup of the current installation..." "INFO"
+
+        $BackupFolder = Join-Path $BasePath "Backup"
+
+        if (-not (Test-Path -LiteralPath $BackupFolder)) {
+            New-Item `
+                -ItemType Directory `
+                -Path $BackupFolder `
+                -Force |
+                Out-Null
+        }
+
+        $BackupItems = Get-ChildItem `
+            -LiteralPath $BasePath `
+            -Force `
+            -ErrorAction Stop |
+            Where-Object {
+                $_.Name -notin @(
+                    "Backup",
+                    "Reports"
+                )
+            }
+
+        if (-not $BackupItems) {
+            throw "No files were found to include in the backup."
+        }
+
+        foreach ($Item in $BackupItems) {
+            Copy-Item `
+                -LiteralPath $Item.FullName `
+                -Destination $BackupStage `
+                -Recurse `
+                -Force `
+                -ErrorAction Stop
+        }
+
+        $BackupZip = Join-Path `
+            $BackupFolder `
+            ("WinFlesher_Backup_v{0}_{1}.zip" -f `
+                $Global:WinFlesher.Version,
+                (Get-Date -Format "yyyyMMdd_HHmmss"))
+
+        Compress-Archive `
+            -Path (Join-Path $BackupStage "*") `
+            -DestinationPath $BackupZip `
+            -CompressionLevel Optimal `
+            -Force `
+            -ErrorAction Stop
+
+        if (-not (Test-Path -LiteralPath $BackupZip -PathType Leaf)) {
+            throw "Backup creation failed."
+        }
+
+        Write-WFLLog "Backup created: $BackupZip" "OK"
+
+        #
+        # DYNAMIC UPDATE BASED ON EXCLUSIONS
+        # Copies everything from the extracted package root except local runtime/state paths.
+        # This ensures newly added directories or files are automatically included in updates.
+        #
+
+        $ExcludedItems = @(
+            "Backup",
+            "Reports",
+            ".git",
+            ".github"
+        )
+
+        $PackageItems = Get-ChildItem -LiteralPath $RepoRoot.FullName -Force
+
+        foreach ($Item in $PackageItems) {
+            if ($Item.Name -in $ExcludedItems) {
+                continue
+            }
+
+            $TargetItemPath = Join-Path $BasePath $Item.Name
+
+            Copy-Item `
+                -LiteralPath $Item.FullName `
+                -Destination $TargetItemPath `
+                -Recurse `
+                -Force `
+                -ErrorAction Stop
+
+            if ($Item.PSIsContainer) {
+                Write-WFLLog "Updated folder: $($Item.Name)" "OK"
+            }
+            else {
+                Write-WFLLog "Updated file: $($Item.Name)" "OK"
+            }
+        }
+
+        Write-WFLLog "WinFlesher updated successfully to version $PackageVersion." "OK"
+        Write-WFLLog "Restart WinFlesher to load the updated files." "WARN"
+
+        return $true
+    }
+    catch {
+        Write-WFLLog "Update failed: $($_.Exception.Message)" "ERROR"
+        Write-WFLLog "The current installation backup, if created, is available under: $(Join-Path $BasePath 'Backup')" "WARN"
+
+        return $false
+    }
+    finally {
+        if (Test-Path -LiteralPath $TempRoot) {
+            Remove-Item `
+                -LiteralPath $TempRoot `
+                -Recurse `
+                -Force `
+                -ErrorAction SilentlyContinue
+        }
     }
 }
 
