@@ -11,7 +11,7 @@
 
 
 $Global:WinFlesher = @{
-    Version   = "2.0.0"
+    Version   = "2.0.1"
 	BuildDate = "2026-08-24"
 	UpdateUrl = "https://raw.githubusercontent.com/mindsflee/WinFlesher/main/version.json"
     RootPath  = $PSScriptRoot
