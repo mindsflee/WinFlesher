@@ -64,29 +64,32 @@ if (Get-ItemProperty -Path $registryPath -Name $entryName -ErrorAction SilentlyC
 
         Add-WFLDetail -Name "Security-APT-Persistence-StartupRunKeys" -Data $SuspiciousEntries
 
-        if ($Issues.Count -gt 0) {
-            Write-Verbose "Persistence risks detected in Registry Run keys / Winlogon."
-            Add-WFLFinding `
-                -Title "Suspicious autostart persistence mechanisms detected" `
-                -Severity "Medium" `
-                -Category "Persistence" `
-                -MITRE "T1547.001" `
-                -Tactic "Persistence" `
-                -Source "Security-APT-Persistence-StartupRunKeys" `
-                -Evidence ($Issues -join " | ") `
-                -Recommendation "Inspect flagged registry paths, remove untrusted autorun values, and analyze associated binaries or scripts."
-        } else {
-            Write-Verbose "Startup Run Keys and Winlogon integrity check passed."
-            Add-WFLFinding `
-                -Title "Registry autostart persistence review passed" `
-                -Severity "Info" `
-                -Category "Persistence" `
-                -MITRE "T1547.001" `
-                -Tactic "Persistence" `
-                -Source "Security-APT-Persistence-StartupRunKeys" `
-                -Evidence "Checked standard HKLM/HKCU Run keys and Winlogon Shell configuration. No suspicious entries found." `
-                -Recommendation "Continue monitoring autostart registry keys using EDR or Sysmon Event ID 13."
-        }
+      if ($Issues.Count -gt 0) {
+        Write-Verbose "Persistence risks detected in Registry Run keys / Winlogon."
+        
+        $Global:WinFlesher.Details["Security-APT-Persistence-StartupRunKeys"] = $Issues
+
+        Add-WFLFinding `
+            -Title "Suspicious autostart persistence mechanisms detected" `
+            -Severity "Medium" `
+            -Category "Persistence" `
+            -MITRE "T1547.001" `
+            -Tactic "Persistence" `
+            -Source "Security-APT-Persistence-StartupRunKeys" `
+            -Evidence "$($Issues.Count) suspicious autostart entry(ies) detected in Registry Run keys / Winlogon." `
+            -Recommendation "Inspect flagged registry paths, remove untrusted autorun values, and analyze associated binaries or scripts."
+    } else {
+        Write-Verbose "Startup Run Keys and Winlogon integrity check passed."
+        Add-WFLFinding `
+            -Title "Registry autostart persistence review passed" `
+            -Severity "Info" `
+            -Category "Persistence" `
+            -MITRE "T1547.001" `
+            -Tactic "Persistence" `
+            -Source "Security-APT-Persistence-StartupRunKeys" `
+            -Evidence "Checked standard HKLM/HKCU Run keys and Winlogon Shell configuration. No suspicious entries found." `
+            -Recommendation "Continue monitoring autostart registry keys using EDR or Sysmon Event ID 13."
+    }
     }
 
 

@@ -70,31 +70,34 @@ Set-ADUser -Identity "TargetUser" -Clear "msDS-KeyCredentialLink"
 
         Add-WFLDetail -Name "Security-APT-ShadowCredentials" -Data $ShadowCredentialTargets
 
-        if ($Issues.Count -gt 0) {
-            Write-Verbose "Shadow Credentials persistence identified on domain objects."
+ if ($Issues.Count -gt 0) {
+    Write-Verbose "Shadow Credentials persistence identified on domain objects."
 
-            Add-WFLFinding `
-                -Title "Active Shadow Credentials (msDS-KeyCredentialLink) detected" `
-                -Severity "High" `
-                -Category "Active Directory" `
-                -MITRE "T1556.001, T1098" `
-                -Tactic "Credential Access, Persistence" `
-                -Source "Security-APT-ShadowCredentials" `
-                -Evidence ($Issues -join " | ") `
-                -Recommendation "Verify whether Windows Hello for Business (WHfB) or FIDO2 keys are legitimately deployed. If WHfB is not used, clear the msDS-KeyCredentialLink attribute on flagged objects and inspect ACLs on the target accounts for unexpected WriteProperty rights."
-        }
-        else {
-            Write-Verbose "Shadow Credentials check completed. No suspicious KeyCredentialLink attributes found."
-            Add-WFLFinding `
-                -Title "Shadow Credentials review passed" `
-                -Severity "Info" `
-                -Category "Active Directory" `
-                -MITRE "T1556.001, T1098" `
-                -Tactic "Persistence" `
-                -Source "Security-APT-ShadowCredentials" `
-                -Evidence "No domain objects currently possess msDS-KeyCredentialLink attributes." `
-                -Recommendation "Monitor Active Directory Directory Service event logs (Event ID 5136) for modifications to the msDS-KeyCredentialLink attribute."
-        }
+
+    $Global:WinFlesher.Details["Security-APT-ShadowCredentials"] = $Issues
+
+    Add-WFLFinding `
+        -Title "Active Shadow Credentials (msDS-KeyCredentialLink) detected" `
+        -Severity "High" `
+        -Category "Active Directory" `
+        -MITRE "T1556.001, T1098" `
+        -Tactic "Credential Access, Persistence" `
+        -Source "Security-APT-ShadowCredentials" `
+        -Evidence "$($Issues.Count) account(s) detected with msDS-KeyCredentialLink attribute populated." `
+        -Recommendation "Verify whether Windows Hello for Business (WHfB) or FIDO2 keys are legitimately deployed. If WHfB is not used, clear the msDS-KeyCredentialLink attribute on flagged objects and inspect ACLs on the target accounts for unexpected WriteProperty rights."
+}
+else {
+    Write-Verbose "Shadow Credentials check completed. No suspicious KeyCredentialLink attributes found."
+    Add-WFLFinding `
+        -Title "Shadow Credentials review passed" `
+        -Severity "Info" `
+        -Category "Active Directory" `
+        -MITRE "T1556.001, T1098" `
+        -Tactic "Persistence" `
+        -Source "Security-APT-ShadowCredentials" `
+        -Evidence "No domain objects currently possess msDS-KeyCredentialLink attributes." `
+        -Recommendation "Monitor Active Directory Directory Service event logs (Event ID 5136) for modifications to the msDS-KeyCredentialLink attribute."
+}
     }
 
 
