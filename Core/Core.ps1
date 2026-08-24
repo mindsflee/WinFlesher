@@ -12,6 +12,7 @@
 
 $Global:WinFlesher = @{
     Version   = "2.0.0"
+	BuildDate = "2026-08-24"
     RootPath  = $PSScriptRoot
     Context   = @{}
     Findings  = New-Object System.Collections.ArrayList
