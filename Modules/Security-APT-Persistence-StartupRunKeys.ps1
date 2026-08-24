@@ -68,7 +68,7 @@ if (Get-ItemProperty -Path $registryPath -Name $entryName -ErrorAction SilentlyC
             Write-Verbose "Persistence risks detected in Registry Run keys / Winlogon."
             Add-WFLFinding `
                 -Title "Suspicious autostart persistence mechanisms detected" `
-                -Severity "High" `
+                -Severity "Medium" `
                 -Category "Persistence" `
                 -MITRE "T1547.001" `
                 -Tactic "Persistence" `
