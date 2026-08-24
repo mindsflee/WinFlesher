@@ -40,9 +40,9 @@ Reset-ADKrbtgtAccountPassword -Identity krbtgt
             Add-WFLDetail -Name "AD-KRBTGT" -Data $KRBTGT
 
             $Severity = "Info"
-            if ($Age -gt 180) { $Severity = "Medium" }
-            if ($Age -gt 365) { $Severity = "High" }
-            if ($Age -gt 730) { $Severity = "Critical" }
+            if ($Age -gt 1095) { $Severity = "Medium" }
+            if ($Age -gt 1825) { $Severity = "High" }
+            if ($Age -gt 3650) { $Severity = "Critical" }
 
             Add-WFLFinding `
                 -Title "KRBTGT password hygiene review" `
