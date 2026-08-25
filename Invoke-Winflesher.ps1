@@ -7,8 +7,6 @@
     remediation strategies.
 .NOTE
     Main entry point loader for the Winflesher framework.
-
-    TEST UPDATE!!!!!
 #>
 
 $ErrorActionPreference = "Stop"
