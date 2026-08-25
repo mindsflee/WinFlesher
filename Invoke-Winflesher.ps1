@@ -14,7 +14,18 @@ $ErrorActionPreference = "Stop"
 try
 {
     $BasePath = Split-Path -Parent $MyInvocation.MyCommand.Path
+# Remove Mark-of-the-Web from all WinFlesher files
+try {
+    Write-Host "[*] Removing Internet zone markers..." -ForegroundColor Cyan
 
+    Get-ChildItem $BasePath -Recurse -File -ErrorAction SilentlyContinue |
+        Unblock-File -ErrorAction SilentlyContinue
+
+    Write-Host "[OK] Files unblocked" -ForegroundColor Green
+}
+catch {
+    Write-Host "[WARN] Unable to unblock some files" -ForegroundColor Yellow
+}
     $LocalModulesPath = Join-Path $BasePath "Modules"
     if (Test-Path $LocalModulesPath) {
         $env:PSModulePath = "$LocalModulesPath;$env:PSModulePath"
