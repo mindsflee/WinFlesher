@@ -10,10 +10,16 @@
 #>
 
 
+$VersionFile = Join-Path $PSScriptRoot "..\version.json"
+
+$VersionInfo = Get-Content $VersionFile -Raw | ConvertFrom-Json
+
 $Global:WinFlesher = @{
-    Version   = "2.0.1"
-	BuildDate = "2026-08-24"
-	UpdateUrl = "https://raw.githubusercontent.com/mindsflee/WinFlesher/main/version.json"
+    Version   = $VersionInfo.Version
+    BuildDate = $VersionInfo.ReleaseDate
+
+    UpdateUrl = "https://raw.githubusercontent.com/mindsflee/WinFlesher/main/version.json"
+
     RootPath  = $PSScriptRoot
     Context   = @{}
     Findings  = New-Object System.Collections.ArrayList
