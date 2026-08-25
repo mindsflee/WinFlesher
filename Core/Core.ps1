@@ -1,4 +1,4 @@
-﻿<#
+<#
 .SYNOPSIS
     Winflesher - Attack Surface Security Framework by mindsflee (Alessandro Salzano)
 .DESCRIPTION
@@ -225,10 +225,6 @@ function Update-WFL {
             throw "Update package version mismatch. Expected $($UpdateInfo.RemoteVersion), found $PackageVersion."
         }
 
-        #
-        # BACKUP CREATION
-        # Reports and local backup folders are excluded from the backup package stage.
-        #
 
         Write-WFLLog "Creating backup of the current installation..." "INFO"
 
@@ -285,11 +281,7 @@ function Update-WFL {
 
         Write-WFLLog "Backup created: $BackupZip" "OK"
 
-        #
-        # DYNAMIC UPDATE BASED ON EXCLUSIONS
-        # Copies everything from the extracted package root except local runtime/state paths.
-        # This ensures newly added directories or files are automatically included in updates.
-        #
+       
 
         $ExcludedItems = @(
             "Backup",
@@ -307,6 +299,7 @@ function Update-WFL {
 
             $TargetItemPath = Join-Path $BasePath $Item.Name
 
+    
             Copy-Item `
                 -LiteralPath $Item.FullName `
                 -Destination $TargetItemPath `
