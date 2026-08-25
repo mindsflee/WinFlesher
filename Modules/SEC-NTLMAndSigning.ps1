@@ -14,7 +14,6 @@ Register-WFLModule `
         Impact        = 'Moderate to High. Enforcing strict security on Domain Controllers may disrupt legacy unauthenticated LDAP/NTLM apps.'
         VariableGuide = 'Domain Controllers Group Policy / Default Domain Controllers Policy.'
         Code          = @'
-# Esempio di configurazione GPO o script di hardening sui DC
 Set-ItemProperty -Path "HKLM:\SYSTEM\CurrentControlSet\Services\LanmanServer\Parameters" -Name "requiresecuritysignature" -Value 1
 '@
     } -Run {
