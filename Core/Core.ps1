@@ -225,6 +225,9 @@ function Update-WFL {
             throw "Update package version mismatch. Expected $($UpdateInfo.RemoteVersion), found $PackageVersion."
         }
 
+        #
+        # BACKUP CREATION
+        #
 
         Write-WFLLog "Creating backup of the current installation..." "INFO"
 
@@ -281,7 +284,10 @@ function Update-WFL {
 
         Write-WFLLog "Backup created: $BackupZip" "OK"
 
-       
+        #
+        # DYNAMIC UPDATE (CORRECTED & CLEAN REPLACEMENT)
+        # Sostituisce i file e le cartelle esistenti senza nidificarli.
+        #
 
         $ExcludedItems = @(
             "Backup",
@@ -299,18 +305,32 @@ function Update-WFL {
 
             $TargetItemPath = Join-Path $BasePath $Item.Name
 
-    
-            Copy-Item `
-                -LiteralPath $Item.FullName `
-                -Destination $TargetItemPath `
-                -Recurse `
-                -Force `
-                -ErrorAction Stop
-
             if ($Item.PSIsContainer) {
+                # Se è una cartella, assicuriamoci che esista nel target e copiamo il contenuto interno
+                if (-not (Test-Path -LiteralPath $TargetItemPath)) {
+                    New-Item -ItemType Directory -Path $TargetItemPath -Force | Out-Null
+                }
+
+                # Copia il contenuto interno della cartella sorgente dentro la cartella di destinazione esistente
+                Get-ChildItem -LiteralPath $Item.FullName -Force | ForEach-Object {
+                    Copy-Item `
+                        -LiteralPath $_.FullName `
+                        -Destination $TargetItemPath `
+                        -Recurse `
+                        -Force `
+                        -ErrorAction Stop
+                }
+
                 Write-WFLLog "Updated folder: $($Item.Name)" "OK"
             }
             else {
+                # Se è un file singolo, lo sovrascriviamo direttamente
+                Copy-Item `
+                    -LiteralPath $Item.FullName `
+                    -Destination $TargetItemPath `
+                    -Force `
+                    -ErrorAction Stop
+
                 Write-WFLLog "Updated file: $($Item.Name)" "OK"
             }
         }
