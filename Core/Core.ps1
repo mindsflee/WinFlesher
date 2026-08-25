@@ -10,10 +10,25 @@
 #>
 
 
+$VersionFile = Join-Path $PSScriptRoot "..\version.json"
+
+$VersionInfo = $null
+
+if (Test-Path $VersionFile) {
+    try {
+        $VersionInfo = Get-Content $VersionFile -Raw | ConvertFrom-Json
+    }
+    catch {
+        Write-Warning "Unable to read local version.json"
+    }
+}
+
 $Global:WinFlesher = @{
-    Version   = "2.0.1"
-	BuildDate = "2026-08-24"
-	UpdateUrl = "https://raw.githubusercontent.com/mindsflee/WinFlesher/main/version.json"
+    Version   = if($VersionInfo){$VersionInfo.Version}else{"0.0.0"}
+    BuildDate = if($VersionInfo){$VersionInfo.BuildDate}else{"Unknown"}
+
+    UpdateUrl = "https://raw.githubusercontent.com/mindsflee/WinFlesher/main/version.json"
+
     RootPath  = $PSScriptRoot
     Context   = @{}
     Findings  = New-Object System.Collections.ArrayList
