@@ -21,7 +21,7 @@ Set-ItemProperty -Path "HKLM:\SYSTEM\CurrentControlSet\Services\LanmanServer\Par
             $Issues = @()
             $AllDCResults = @()
 
-            # Recupera i Domain Controller dalla context di WinFlesher o direttamente da AD
+           
             $DomainControllers = $null
             if ($Global:WinFlesher.Context.ADDomainControllers) {
                 $DomainControllers = $Global:WinFlesher.Context.ADDomainControllers
@@ -31,7 +31,7 @@ Set-ItemProperty -Path "HKLM:\SYSTEM\CurrentControlSet\Services\LanmanServer\Par
                 $DomainControllers = Get-ADDomainController -Filter * -ErrorAction SilentlyContinue
             }
 
-            # Se non siamo in un dominio o non ci sono DC visibili, fallback sul locale con warning
+           
             if (-not $DomainControllers) {
                 Write-WFLLog "No Active Directory domain controllers found. Falling back to local machine check." "WARN"
                 $DomainControllers = @([PSCustomObject]@{ HostName = $env:COMPUTERNAME })
@@ -42,7 +42,7 @@ Set-ItemProperty -Path "HKLM:\SYSTEM\CurrentControlSet\Services\LanmanServer\Par
                 Write-WFLLog "Auditing NTLM/LDAP hardening on Domain Controller: $DCName" "INFO"
 
                 try {
-                    # Esegue il controllo in remoto sul DC (oppure in locale se è la macchina corrente)
+                  
                     if ($DCName -eq $env:COMPUTERNAME -or $DCName -eq "localhost" -or $DCName -eq "127.0.0.1") {
                         $LsaPath = "HKLM:\SYSTEM\CurrentControlSet\Control\Lsa"
                         $LdapPath = "HKLM:\SYSTEM\CurrentControlSet\Services\NTDS\Parameters"
@@ -52,7 +52,7 @@ Set-ItemProperty -Path "HKLM:\SYSTEM\CurrentControlSet\Services\LanmanServer\Par
                         $LdapChannelBinding = (Get-ItemProperty -Path $LdapPath -Name "LdapEnforceChannelBinding" -ErrorAction SilentlyContinue).LdapEnforceChannelBinding
                     }
                     else {
-                        # Remote check via ScriptBlock su CIM/Registry (richiede permessi di Admin sul dominio)
+                       
                         $RemoteData = Invoke-Command -ComputerName $DCName -ScriptBlock {
                             $lPath = "HKLM:\SYSTEM\CurrentControlSet\Control\Lsa"
                             $dPath = "HKLM:\SYSTEM\CurrentControlSet\Services\NTDS\Parameters"
