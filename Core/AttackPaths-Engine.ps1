@@ -1,4 +1,4 @@
-﻿<#
+<#
 .SYNOPSIS
     Winflesher - Attack Surface Security Framework by mindsflee (Alessandro Salzano)
 .DESCRIPTION
@@ -106,37 +106,74 @@ function Show-AttackPaths {
         }
     }
 
-    function Get-WFLImpactDescription {
-        param(
-            [string]$Impact
-        )
+function Get-WFLRiskFromImpact {
+    param(
+        [string]$Impact,
+        [object[]]$Nodes
+    )
 
-        switch ($Impact) {
-            "POTENTIAL DOMAIN COMPROMISE" {
-                return "Possible compromise of Active Directory, Tier-0 assets, or hybrid identity control."
-            }
+    $Score = 0
 
-            "POTENTIAL PRIVILEGE ESCALATION" {
-                return "Possible elevation to privileged local, service, domain, or administrative access."
-            }
+    foreach ($Node in $Nodes) {
 
-            "POTENTIAL CREDENTIAL COMPROMISE" {
-                return "Possible credential theft, account takeover, Kerberos abuse, or secret exposure."
-            }
+        switch ($Node.Severity) {
 
-            "POTENTIAL PERSISTENCE" {
-                return "Possible long-term unauthorized access or attacker re-entry capability."
-            }
+            "Critical" { $Score += 10 }
+            "High"     { $Score += 6 }
+            "Medium"   { $Score += 3 }
+            "Low"      { $Score += 1 }
+            default    { $Score += 0 }
 
-            "POTENTIAL LATERAL MOVEMENT" {
-                return "Possible movement across systems, identities, trusts, or network paths."
-            }
-
-            default {
-                return "Potential security impact requires manual validation."
-            }
         }
     }
+
+  
+
+    $ContextText = ($Nodes | ForEach-Object {
+        "$($_.ModuleName) $($_.Title)"
+    }) -join " "
+
+    if (
+        ($ContextText -match "Kerberoast|ASREP") -and
+        ($ContextText -match "Delegation|RBCD")
+    ) {
+        $Score += 5
+    }
+
+    if (
+        ($ContextText -match "DCSync") -and
+        ($ContextText -match "Delegation|RBCD|AdminSDHolder")
+    ) {
+        $Score += 5
+    }
+
+
+
+    if ($ContextText -match "Golden Ticket|KRBTGT|DCSync|ESC4|ESC7|AdminSDHolder") {
+        $Score = [int]($Score * 1.5)
+    }
+
+    
+
+    if ($Score -ge 25) {
+        return "CRITICAL"
+    }
+
+    if ($Score -ge 12) {
+        return "HIGH"
+    }
+
+    if ($Score -ge 6) {
+        return "MEDIUM"
+    }
+
+    if ($Score -ge 1) {
+        return "LOW"
+    }
+
+    return "INFO"
+}
+
 
    function Get-WFLRecommendedAction {
         param(
