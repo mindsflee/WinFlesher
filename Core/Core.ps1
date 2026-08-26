@@ -872,19 +872,19 @@ function Get-WFLScore {
         Where-Object { $_.Severity -eq "Info" }
     ).Count
 
-    $Rating = "Very Good"
+    $Rating = "Bulletproof"
 
     if($Score -lt 50)
     {
-        $Rating = "Critical"
+        $Rating = "Cooked"
     }
     elseif($Score -lt 70)
     {
-        $Rating = "Weak"
+        $Rating = "Bleeding"
     }
     elseif($Score -lt 85)
     {
-        $Rating = "Good"
+        $Rating = "Solid"
     }
 
     [PSCustomObject]@{

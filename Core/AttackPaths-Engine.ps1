@@ -1,4 +1,4 @@
-<#
+﻿<#
 .SYNOPSIS
     Winflesher - Attack Surface Security Framework by mindsflee (Alessandro Salzano)
 .DESCRIPTION
