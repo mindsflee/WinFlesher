@@ -75,107 +75,87 @@ function Show-AttackPaths {
             [object[]]$Nodes
         )
 
-        if ($Nodes | Where-Object { $_.Severity -eq "Critical" }) {
+        $Score = 0
+
+        foreach ($Node in $Nodes) {
+            switch ($Node.Severity) {
+                "Critical" { $Score += 10 }
+                "High"     { $Score += 6 }
+                "Medium"   { $Score += 3 }
+                "Low"      { $Score += 1 }
+                default    { $Score += 0 }
+            }
+        }
+
+        $ContextText = ($Nodes | ForEach-Object {
+            "$($_.ModuleName) $($_.Title)"
+        }) -join " "
+
+        if (
+            ($ContextText -match "Kerberoast|ASREP") -and
+            ($ContextText -match "Delegation|RBCD")
+        ) {
+            $Score += 5
+        }
+
+        if (
+            ($ContextText -match "DCSync") -and
+            ($ContextText -match "Delegation|RBCD|AdminSDHolder")
+        ) {
+            $Score += 5
+        }
+
+        if ($ContextText -match "Golden Ticket|KRBTGT|DCSync|ESC4|ESC7|AdminSDHolder") {
+            $Score = [int]($Score * 1.5)
+        }
+
+        if ($Score -ge 25) {
             return "CRITICAL"
         }
 
+        if ($Score -ge 12) {
+            return "HIGH"
+        }
+
+        if ($Score -ge 6) {
+            return "MEDIUM"
+        }
+
+        if ($Score -ge 1) {
+            return "LOW"
+        }
+
+        return "INFO"
+    }
+
+    function Get-WFLImpactDescription {
+        param(
+            [string]$Impact
+        )
+
         switch ($Impact) {
             "POTENTIAL DOMAIN COMPROMISE" {
-                return "CRITICAL"
+                return "Attack paths allow complete directory takeover, enabling full control over domain controllers, authentication services, and enterprise assets."
             }
-
             "POTENTIAL PRIVILEGE ESCALATION" {
-                return "HIGH"
+                return "Identified misconfigurations permit unauthorized elevation of privileges from standard user accounts to administrative or privileged tiers."
             }
-
             "POTENTIAL CREDENTIAL COMPROMISE" {
-                return "HIGH"
+                return "Vulnerabilities expose credentials, service tickets, or sensitive hashes that can be intercepted, coerced, or cracked offline."
             }
-
             "POTENTIAL PERSISTENCE" {
-                return "HIGH"
+                return "Weaknesses allow attackers to establish long-term access mechanisms across systems and directory objects that survive reboots and credential resets."
             }
-
             "POTENTIAL LATERAL MOVEMENT" {
-                return "MEDIUM"
+                return "Network or protocol misconfigurations facilitate pivoting across hosts, subnets, and connected system boundaries."
             }
-
             default {
-                return "MEDIUM"
+                return "Aggregated attack path vector presenting potential risks to the structural integrity and security posture of the environment."
             }
         }
     }
 
-function Get-WFLRiskFromImpact {
-    param(
-        [string]$Impact,
-        [object[]]$Nodes
-    )
-
-    $Score = 0
-
-    foreach ($Node in $Nodes) {
-
-        switch ($Node.Severity) {
-
-            "Critical" { $Score += 10 }
-            "High"     { $Score += 6 }
-            "Medium"   { $Score += 3 }
-            "Low"      { $Score += 1 }
-            default    { $Score += 0 }
-
-        }
-    }
-
-  
-
-    $ContextText = ($Nodes | ForEach-Object {
-        "$($_.ModuleName) $($_.Title)"
-    }) -join " "
-
-    if (
-        ($ContextText -match "Kerberoast|ASREP") -and
-        ($ContextText -match "Delegation|RBCD")
-    ) {
-        $Score += 5
-    }
-
-    if (
-        ($ContextText -match "DCSync") -and
-        ($ContextText -match "Delegation|RBCD|AdminSDHolder")
-    ) {
-        $Score += 5
-    }
-
-
-
-    if ($ContextText -match "Golden Ticket|KRBTGT|DCSync|ESC4|ESC7|AdminSDHolder") {
-        $Score = [int]($Score * 1.5)
-    }
-
-    
-
-    if ($Score -ge 25) {
-        return "CRITICAL"
-    }
-
-    if ($Score -ge 12) {
-        return "HIGH"
-    }
-
-    if ($Score -ge 6) {
-        return "MEDIUM"
-    }
-
-    if ($Score -ge 1) {
-        return "LOW"
-    }
-
-    return "INFO"
-}
-
-
-   function Get-WFLRecommendedAction {
+    function Get-WFLRecommendedAction {
         param(
             [string]$Impact,
             [object[]]$Nodes
@@ -389,13 +369,13 @@ function Get-WFLRiskFromImpact {
             [void]$Builder.AppendLine("|$($ImpactHeaderContent.PadRight(78))|")
             [void]$Builder.AppendLine("+------------------------------------------------------------------------------+")
             
-            $RiskLine = "  • RISK LEVEL       : $Risk"
+            $RiskLine = "  • RISK LEVEL        : $Risk"
             [void]$Builder.AppendLine("|$($RiskLine.PadRight(78))|")
             
             $DescLines = Format-WFLWrappedLines -Text $ImpactDescription -MaxWidth 53
             foreach ($Line in $DescLines) {
                 if ($Line -eq $DescLines[0]) {
-                    $DescLine = "  • DESCRIPTION      : $Line"
+                    $DescLine = "  • DESCRIPTION       : $Line"
                     [void]$Builder.AppendLine("|$($DescLine.PadRight(78))|")
                 } else {
                     $DescLine = "                       $Line"
@@ -408,7 +388,7 @@ function Get-WFLRiskFromImpact {
 
             if ($PrimaryAttackRisks.Count -gt 0) {
                 [void]$Builder.AppendLine("    PRIMARY ATTACK RISKS")
-                [void]$Builder.AppendLine("  ───────────────────────")
+                [void]$Builder.AppendLine("   ───────────────────────")
 
                 $Index = 0
                 $Last = $PrimaryAttackRisks.Count
@@ -439,7 +419,7 @@ function Get-WFLRiskFromImpact {
 
             if ($ContributingConditions.Count -gt 0) {
                 [void]$Builder.AppendLine("     CONTRIBUTING CONDITIONS")
-                [void]$Builder.AppendLine("  ───────────────────────────")
+                [void]$Builder.AppendLine("   ───────────────────────────")
 
                 $Index = 0
                 $Last = $ContributingConditions.Count
@@ -469,7 +449,7 @@ function Get-WFLRiskFromImpact {
             }
 
             [void]$Builder.AppendLine("    RECOMMENDED ACTION")
-            [void]$Builder.AppendLine("  ─────────────────────")
+            [void]$Builder.AppendLine("   ─────────────────────")
             
             $RecActionText = Get-WFLRecommendedAction -Impact $Impact -Nodes $ImpactNodes
             $WrappedRecLines = Format-WFLWrappedLines -Text $RecActionText -MaxWidth 72
