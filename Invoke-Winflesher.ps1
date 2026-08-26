@@ -126,12 +126,13 @@ Add-WindowsCapability -Online -Name Rsat.ActiveDirectory.DS-LDS.Tools~~~~0.0.1.0
     Write-Host "==================================" -ForegroundColor Cyan
     Write-Host " [1] Launch Interactive GUI" -ForegroundColor White
     Write-Host " [2] Run Full Assessment & Export HTML/CSV/JSON (Headless)" -ForegroundColor White
-    Write-Host " [3] Update WinFlesher" -ForegroundColor White
+    Write-Host " [3] Authenticate with Microsoft Entra ID (Azure AD)" -ForegroundColor White
+    Write-Host " [4] Update WinFlesher" -ForegroundColor White
     Write-Host ""
     
-    $Choice = Read-Host "Select an option [1-3]"
+    $Choice = Read-Host "Select an option [1-4]"
     
-    if ($Choice -eq "3") {
+    if ($Choice -eq "4") {
         Write-Host ""
         Write-Host "[*] Checking for updates..." -ForegroundColor Cyan
 
@@ -175,6 +176,42 @@ Add-WindowsCapability -Online -Name Rsat.ActiveDirectory.DS-LDS.Tools~~~~0.0.1.0
         return
     }
 
+  if ($Choice -eq "3") {
+        Write-Host ""
+        Write-Host "[*] Preparing Microsoft Entra ID authentication..." -ForegroundColor Cyan
+        Write-Host "[!] A web browser window will now open for authentication. Please complete the sign-in." -ForegroundColor Yellow
+
+        $hasGraph = Get-Module -ListAvailable -Name "Microsoft.Graph.Applications" -ErrorAction SilentlyContinue
+        $hasAzureAD = Get-Module -ListAvailable -Name "AzureAD" -ErrorAction SilentlyContinue
+
+        if (-not $hasGraph -and -not $hasAzureAD) {
+            Write-Host "[ERROR] Required modules (Microsoft.Graph.Applications or AzureAD) are not installed." -ForegroundColor Red
+            Write-Host "[*] Run: Install-Module Microsoft.Graph.Applications" -ForegroundColor Yellow
+            return
+        }
+
+        try {
+            if (Get-Command Connect-MgGraph -ErrorAction SilentlyContinue) {
+                Connect-MgGraph -Scopes "Application.Read.All", "Directory.Read.All" -NoWelcome
+                $ctx = Get-MgContext
+                if ($ctx) {
+                    Write-Host "[OK] Successfully connected to Entra ID Tenant: $($ctx.TenantId) as $($ctx.Account). Please Run Again Winflesher." -ForegroundColor Green
+                }
+            } 
+            elseif (Get-Command Connect-AzureAD -ErrorAction SilentlyContinue) {
+                Connect-AzureAD | Out-Null
+                $session = Get-AzureADCurrentSessionInfo
+                if ($session) {
+                    Write-Host "[OK] Successfully connected to AzureAD Tenant: $($session.TenantDomain). Please Run Again Winflesher." -ForegroundColor Green
+                }
+            }
+        }
+        catch {
+            Write-Host "[ERROR] Cloud Connect Exception: $_" -ForegroundColor Red
+        }
+        return
+    }
+
     if ($Choice -eq "2") {
         Write-Host "[*] Starting automated assessment..." -ForegroundColor Cyan
         
@@ -208,5 +245,8 @@ catch
     Write-Host ""
     Write-Host "[ERROR] $_" -ForegroundColor Red
     Write-Host ""
-    [System.Windows.Forms.MessageBox]::Show($_.Exception.Message, "WinFlesher Startup Error", "OK", "Error") | Out-Null
+    try {
+        [System.Windows.Forms.MessageBox]::Show($_.Exception.Message, "WinFlesher Startup Error", "OK", "Error") | Out-Null
+    }
+    catch {}
 }
