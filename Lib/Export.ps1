@@ -1,4 +1,4 @@
-﻿<#
+<#
 .SYNOPSIS
     Winflesher - Attack Surface Security Framework by mindsflee (Alessandro Salzano)
 .DESCRIPTION
@@ -75,7 +75,7 @@ function Export-WFLReportHtml {
         $sevClass = "sev-$($f.Severity.ToLower())"
         "<tr><td>$($f.Time)</td><td class='$sevClass'><b>$($f.Severity)</b></td><td>$($f.Category)</td><td>$($f.MITRE)</td><td>$($f.Tactic)</td><td>$($f.Impact)</td><td>$($f.Title)</td><td>$($f.Evidence)</td><td>$($f.Recommendation)</td><td>$($f.Source)</td></tr>"
     }
-    $FindingsHtml = "<table><thead><tr><th>Time</th><th>Severity</th><th>Category</th><th>MITRE</th><th>Tactic</th><th>Impact</th><th>Title</th><th>Evidence</th><th>Recommendation</th><th>Source</th></tr></thead><tbody>" + ($FindingsRows -join "`n") + "</tbody></table>"
+    $FindingsHtml = "<div class='table-responsive'><table><thead><tr><th>Time</th><th>Severity</th><th>Category</th><th>MITRE</th><th>Tactic</th><th>Impact</th><th>Title</th><th>Evidence</th><th>Recommendation</th><th>Source</th></tr></thead><tbody>" + ($FindingsRows -join "`n") + "</tbody></table></div>"
 
     $ModulesHtml  = $Modules | ConvertTo-Html -Fragment
     
@@ -187,6 +187,7 @@ function Export-WFLReportHtml {
 <html lang="en">
 <head>
 <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>WinFlesher Executive Security Report</title>
 <style>
 :root {
@@ -207,7 +208,7 @@ body {
     background-color: var(--bg-main) !important;
     color: var(--text-primary) !important;
     margin: 0;
-    padding: 32px;
+    padding: 24px;
 }
 
 .header-container {
@@ -217,12 +218,15 @@ body {
     border-bottom: 2px solid var(--border-color);
     padding-bottom: 16px;
     margin-bottom: 28px;
+    flex-wrap: wrap;
+    gap: 16px;
 }
 
 .header-logo {
-    max-height: 150px;
+    max-height: 120px;
     width: auto;
     display: block;
+    max-width: 100%;
 }
 
 h1 {
@@ -257,8 +261,8 @@ h2 {
 
 .chart-container {
     position: relative;
-    width: 220px;
-    height: 220px;
+    width: 200px;
+    height: 200px;
     margin: 0 auto;
 }
 
@@ -276,7 +280,7 @@ h2 {
 }
 
 .chart-center-score {
-    font-size: 44px;
+    font-size: 40px;
     font-weight: 800;
     line-height: 1;
     color: $ScoreColor;
@@ -292,7 +296,7 @@ h2 {
 
 .meta-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
     gap: 16px;
     margin-bottom: 16px;
 }
@@ -315,6 +319,7 @@ h2 {
 .meta-item .val {
     font-size: 15px;
     font-weight: 600;
+    word-break: break-all;
 }
 
 .badge-list {
@@ -343,14 +348,22 @@ td.sev-medium   { color: var(--medium-color) !important; }
 td.sev-low      { color: var(--low-color) !important; }
 td.sev-info     { color: var(--info-color) !important; }
 
+.table-responsive {
+    width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    margin-top: 12px;
+    border-radius: 8px;
+    border: 1px solid var(--border-color);
+    background: var(--card-bg);
+}
+
 table {
     border-collapse: collapse !important;
     width: 100% !important;
-    background: var(--card-bg) !important;
-    border-radius: 8px !important;
-    overflow: hidden !important;
-    margin-top: 12px !important;
-    border: 1px solid var(--border-color) !important;
+    background: transparent !important;
+    margin-top: 0 !important;
+    border: none !important;
 }
 
 th {
@@ -360,6 +373,7 @@ th {
     text-align: left !important;
     font-size: 13px !important;
     border-bottom: 1px solid var(--border-color) !important;
+    white-space: nowrap;
 }
 
 tr {
@@ -389,7 +403,7 @@ tr:hover {
 }
 
 .details-grid {
-    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
     display: grid;
     gap: 16px;
     margin-top: 20px;
@@ -453,6 +467,29 @@ pre {
     white-space: pre-wrap;        
     word-wrap: break-word;
     font-family: 'Consolas', 'Monaco', monospace;
+}
+
+/* Media Queries for Mobile Screens */
+@media (max-width: 768px) {
+    body {
+        padding: 12px;
+    }
+
+    .dashboard-grid {
+        grid-template-columns: 1fr;
+    }
+
+    h1 {
+        font-size: 22px;
+    }
+
+    h2 {
+        font-size: 18px;
+    }
+
+    .card {
+        padding: 14px;
+    }
 }
 </style>
 </head>
