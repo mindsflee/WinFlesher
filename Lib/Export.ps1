@@ -38,7 +38,7 @@ function Export-WFLReportHtml {
         try {
             $ImageBytes = [System.IO.File]::ReadAllBytes($LogoPath)
             $Base64Str = [System.Convert]::ToBase64String($ImageBytes)
-            $HeaderContent = "<img src='data:image/jpeg;base64,$Base64Str' alt='WinFlesher Logo' class='header-logo'>"
+            $HeaderContent = "<img src='data:image/png;base64,$Base64Str' alt='WinFlesher Logo' class='header-logo'>"
             Write-Verbose "Logo loaded and converted to embedded Base64 successfully."
         }
         catch {
