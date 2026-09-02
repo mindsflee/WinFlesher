@@ -2,8 +2,8 @@
     -Name "Windows-Firewall-Baseline" `
     -Category "Network Security" `
     -Type "Check" `
-    -MITRE "" `
-    -Tactic "Defense" `
+    -MITRE "T1562.004" `
+    -Tactic "Defense Evasion" `
     -Impact "NO ATTACK PATH IMPACT" `
     -Description "Checks Windows Firewall profile status and default inbound policy." `
         -Remediation @{
