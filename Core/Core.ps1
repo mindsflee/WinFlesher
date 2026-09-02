@@ -358,7 +358,6 @@ function Update-WFL {
 }
 
 function Add-WFLFinding {
-
     param(
         [Parameter(Mandatory)]
         [string]$Title,
@@ -376,16 +375,22 @@ function Add-WFLFinding {
     )
 
     if (
-        [string]::IsNullOrEmpty($Impact) -and
-        -not [string]::IsNullOrEmpty($Source)
+        -not [string]::IsNullOrEmpty($Source) -and
+        $Global:WinFlesher.Modules -and
+        $Global:WinFlesher.Modules.ContainsKey($Source)
     ) {
+        $Module = $Global:WinFlesher.Modules[$Source]
 
-        if (
-            $Global:WinFlesher.Modules -and
-            $Global:WinFlesher.Modules.ContainsKey($Source)
-        ) {
+        if ([string]::IsNullOrWhiteSpace($Impact) -and -not [string]::IsNullOrWhiteSpace($Module.Impact)) {
+            $Impact = $Module.Impact
+        }
 
-            $Impact = $Global:WinFlesher.Modules[$Source].Impact
+        if ([string]::IsNullOrWhiteSpace($MITRE) -and -not [string]::IsNullOrWhiteSpace($Module.MITRE)) {
+            $MITRE = $Module.MITRE
+        }
+
+        if ([string]::IsNullOrWhiteSpace($Tactic) -and -not [string]::IsNullOrWhiteSpace($Module.Tactic)) {
+            $Tactic = $Module.Tactic
         }
     }
 
