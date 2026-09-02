@@ -2,7 +2,7 @@
     -Name "ADCS-Discovery" `
     -Category "Active Directory Certificate Services" `
     -Type "Check" `
-    -MITRE "" `
+    -MITRE "T1590.001" `
     -Tactic "Credential Access" `
     -Impact "NO ATTACK PATH IMPACT" `
     -Description "Discovers AD CS Enterprise CA objects and published certificate templates." `
