@@ -1,23 +1,24 @@
-﻿$Module = @{
-    Name         = "AD-ShadowAdmins-V2"
-    Category     = "Active Directory"
-    Type         = "Check"
-    MITRE        = "T1098"
-    Tactic       = "Persistence"
-    Impact       = "POTENTIAL DOMAIN COMPROMISE"
-    Description  = "Reviews dangerous delegated permissions on Tier-0 Active Directory objects using DirectoryServices ACL parsing."
-    
-   
-    Remediation  = @{
-        Category      = "Persistence / ACL Abuse"
-        Type          = "Specific"
-        Description   = "Identifies and strips dangerous explicit object control permissions (such as GenericAll, WriteDacl, WriteOwner, and ResetPassword) granted to non-standard principals on Tier-0 Active Directory objects (AdminSDHolder and privileged groups)."
-        Impact        = "Moderate. Removing unauthorized explicit ACEs neutralizes stealthy persistence and privilege escalation vectors, but verify that legitimate administrative delegation models are not disrupted."
+﻿Register-WFLModule `
+    -Name "AD-ShadowAdmins-V2" `
+    -Category "Active Directory" `
+    -Type "Check" `
+    -MITRE "T1098" `
+    -Tactic "Persistence" `
+    -Impact "POTENTIAL DOMAIN COMPROMISE" `
+    -Description "Reviews dangerous delegated permissions on Tier-0 Active Directory objects using DirectoryServices ACL parsing." `
+    -Remediation @{
+        Module        = 'AD-ShadowAdmins-V2'
+        Category      = 'Persistence / ACL Abuse'
+        Type          = 'Specific'
+        Description   = 'Identifies and strips dangerous explicit object control permissions (such as GenericAll, WriteDacl, WriteOwner, and ResetPassword) granted to non-standard principals on Tier-0 Active Directory objects (AdminSDHolder and privileged groups).'
+        Impact        = 'Moderate. Removing unauthorized explicit ACEs neutralizes stealthy persistence and privilege escalation vectors, but verify that legitimate administrative delegation models are not disrupted.'
         VariableGuide = '$TargetDN: The Distinguished Name of the Tier-0 object (e.g., AdminSDHolder or Domain Admins) requiring ACL sanitization.'
-        Code          = '$TargetDN = "CN=AdminSDHolder,CN=System,DC=corp,DC=local"; $Acl = Get-Acl "AD:\$TargetDN"; # Review explicit rules and remove unauthorized access control entries.'
-    }
-
-    Run          = {
+        Code          = @'
+$TargetDN = "CN=AdminSDHolder,CN=System,DC=corp,DC=local"
+$Acl = Get-Acl "AD:\$TargetDN"
+# Review explicit rules and remove unauthorized access control entries.
+'@
+    } -Run {
 
         if (-not $Global:WinFlesher.Context.ActiveDirectory.Available) {
             Add-WFLFinding `
@@ -369,6 +370,3 @@
                 -Recommendation "Verify Active Directory module, permissions and domain connectivity."
         }
     }
-}
-
-Register-WFLModule @Module
