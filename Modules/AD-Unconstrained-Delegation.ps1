@@ -2,8 +2,8 @@
     -Name "AD-Unconstrained-Delegation" `
     -Category "Active Directory" `
     -Type "Check" `
-    -MITRE "T1558" `
-    -Tactic "Credential Access" `
+    -MITRE "T1550.003" `
+    -Tactic "Pass the Ticket" `
     -Impact "POTENTIAL DOMAIN COMPROMISE" `
     -Description "Reviews unconstrained delegation." `
         -Remediation @{
