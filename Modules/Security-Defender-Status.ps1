@@ -2,8 +2,8 @@
     -Name "Security-Defender-Status" `
     -Category "Endpoint Security" `
     -Type "Check" `
-    -MITRE "" `
-    -Tactic "Defense" `
+    -MITRE "T1562.001" `
+    -Tactic "Defense Evasion" `
     -Impact "NO ATTACK PATH IMPACT" `
     -Description "Checks Microsoft Defender status where available." `
         -Remediation @{
