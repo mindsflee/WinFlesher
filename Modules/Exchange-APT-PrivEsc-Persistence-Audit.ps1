@@ -51,7 +51,6 @@ Register-WFLModule `
             return
         }
 
-)
  
         $AgentResults = @()
         try {
