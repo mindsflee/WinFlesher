@@ -3,7 +3,7 @@
     -Category "Active Directory" `
     -Type "Check" `
     -MITRE "T1098" `
-    -Tactic "Persistence" `
+    -Tactic "Account Manipulation" `
     -Impact "POTENTIAL PERSISTENCE" `
     -Description "Reviews protected accounts with AdminCount=1." `
         -Remediation @{
