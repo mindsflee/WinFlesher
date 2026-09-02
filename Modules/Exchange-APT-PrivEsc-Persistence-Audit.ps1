@@ -14,15 +14,14 @@ Register-WFLModule `
         Impact        = 'Critical. Improper management or lingering backdoors can lead directly to total domain compromise and remote code execution.'
         VariableGuide = '$Identity: The transport agent name, suspicious file path, RBAC member, or security principal holding validated dangerous AD integration rights.'
         Code          = @'
-# Esempi di remediations comuni:
 # Remove-Item -Path "C:\Program Files\Microsoft\Exchange Server\V15\FrontEnd\HttpProxy\owa\auth\webshell.aspx" -Force
 # Uninstall-TransportAgent -Identity "NomeAgentSospetto"
-# Remove-RoleGroupMember -Identity "Organization Management" -Member "UtenteSospetto" -Confirm:$false
-# Remove-ADGroupMember -Identity "Exchange Windows Permissions" -Member "UtenteNonAutorizzato" -Confirm:$false
+# Remove-RoleGroupMember -Identity "Organization Management" -Member "UserName" -Confirm:$false
+# Remove-ADGroupMember -Identity "Exchange Windows Permissions" -Member "UserName" -Confirm:$false
 '@
     } -Run {
     try {
-        # 1. Verifica della disponibilità dell'ambiente Exchange
+       
         $ExchangeModuleAvailable = $false
         try {
             if (Get-Command Get-TransportAgent -ErrorAction SilentlyContinue) {
@@ -52,9 +51,8 @@ Register-WFLModule `
             return
         }
 
-        # ==========================================
-        # PARTE 1: Audit dei Transport Agents (T1505.004)
-        # ==========================================
+)
+ 
         $AgentResults = @()
         try {
             $Agents = Get-TransportAgent -ErrorAction Stop
@@ -129,9 +127,6 @@ Register-WFLModule `
             }
         }
 
-        # ==========================================
-        # PARTE 2: Ricerca WebShell nelle directory di Exchange / IIS (T1505.003)
-        # ==========================================
         $WebShellResults = @()
         try {
             $ExchangeInstallPath = $env:ExchangeInstallPath
@@ -235,9 +230,7 @@ Register-WFLModule `
             }
         }
 
-        # ==========================================
-        # PARTE 3: Audit dei Ruoli RBAC Privilegiati (T1098)
-        # ==========================================
+  
         $RbacResults = @()
         try {
             $CriticalRoleGroups = @(
@@ -294,9 +287,7 @@ Register-WFLModule `
             }
         }
 
-        # ==========================================
-        # PARTE 4: Audit AD PrivEsc / Exchange Windows Permissions (T1098 / T1078)
-        # ==========================================
+      
         $AdPrivEscResults = @()
         try {
             if (Get-Command Get-ADGroup -ErrorAction SilentlyContinue) {
@@ -365,11 +356,11 @@ Register-WFLModule `
             }
         }
 
-        # Unione di tutti i risultati
+      
         $CombinedResults = $AgentResults + $WebShellResults + $RbacResults + $AdPrivEscResults
         Add-WFLDetail -Name "Exchange-APT-PrivEsc-Persistence-Audit" -Data $CombinedResults
 
-        # Calcolo della severità globale
+ 
         $CriticalRisk = @($CombinedResults | Where-Object { $_.EffectiveSeverity -eq "Critical" })
         $HighRisk     = @($CombinedResults | Where-Object { $_.EffectiveSeverity -eq "High" })
         $MediumRisk   = @($CombinedResults | Where-Object { $_.EffectiveSeverity -eq "Medium" })
