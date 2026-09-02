@@ -3,7 +3,7 @@
     -Category "Active Directory Certificate Services" `
     -Type "Check" `
     -MITRE "T1590.001" `
-    -Tactic "Credential Access" `
+    -Tactic "Discovery" `
     -Impact "NO ATTACK PATH IMPACT" `
     -Description "Discovers AD CS Enterprise CA objects and published certificate templates." `
    -Remediation @{
