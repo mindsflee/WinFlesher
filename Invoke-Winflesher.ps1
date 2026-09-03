@@ -184,7 +184,7 @@ Add-WindowsCapability -Online -Name Rsat.ActiveDirectory.DS-LDS.Tools~~~~0.0.1.0
         $hasGraph = Get-Module -ListAvailable -Name "Microsoft.Graph.Applications" -ErrorAction SilentlyContinue
         $hasAzureAD = Get-Module -ListAvailable -Name "AzureAD" -ErrorAction SilentlyContinue
 
-        if (-not $hasGraph -and -not $hasAzureAD) {
+        if (-not $hasGraph -or -not $hasAzureAD) {
             Write-Host "[ERROR] Required modules (Microsoft.Graph.Applications or AzureAD) are not installed." -ForegroundColor Red
             Write-Host "[*] Run: Install-Module Microsoft.Graph.Applications" -ForegroundColor Yellow
             return
