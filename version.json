@@ -1,6 +1,6 @@
 {
-    "Version": "2.0.4",
-    "ReleaseDate": "2026-08-27",
-    "ReleaseNotes": "Added update system, improved remediation engine, improved attack path analysis, improved export engine.",
+    "Version": "2.0.5",
+    "ReleaseDate": "2026-09-03",
+    "ReleaseNotes": "Added new modules",
     "ZipUrl": "https://github.com/mindsflee/WinFlesher/archive/refs/heads/main.zip"
 }
