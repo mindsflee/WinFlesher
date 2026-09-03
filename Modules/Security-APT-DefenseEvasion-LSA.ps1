@@ -1,6 +1,6 @@
 ﻿Register-WFLModule `
     -Name "Security-APT-DefenseEvasion-LSA" `
-    -Category "Endpoint Security" `
+    -Category "Defense Evasion" `
     -Type "Check" `
     -MITRE "T1003.001, T1562.001" `
     -Tactic "Credential Access, Defense Evasion" `
@@ -71,7 +71,7 @@ Set-ItemProperty -Path "HKLM:\SYSTEM\CurrentControlSet\Control\Lsa" -Name "RunAs
             Add-WFLFinding `
                 -Title "APT Credential Access and LSASS protection gaps detected" `
                 -Severity $Severity `
-                -Category "Endpoint Security" `
+                -Category "Defense Evasion" `
                 -MITRE "T1003.001, T1562.001" `
                 -Tactic "Credential Access, Defense Evasion" `
                 -Source "Security-APT-DefenseEvasion-LSA" `
@@ -83,7 +83,7 @@ Set-ItemProperty -Path "HKLM:\SYSTEM\CurrentControlSet\Control\Lsa" -Name "RunAs
             Add-WFLFinding `
                 -Title "APT Credential and LSA protections review passed" `
                 -Severity "Info" `
-                -Category "Endpoint Security" `
+                -Category "Defense Evasion" `
                 -MITRE "T1003.001, T1562.001" `
                 -Tactic "Credential Access, Defense Evasion" `
                 -Source "Security-APT-DefenseEvasion-LSA" `

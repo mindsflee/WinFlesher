@@ -1,6 +1,6 @@
 Register-WFLModule `
     -Name "Exchange-APT-PrivEsc-Persistence-Audit" `
-    -Category "Exchange" `
+    -Category "Privilege Escalation" `
     -Type "Check" `
     -MITRE "T1505.003, T1505.004, T1098" `
     -Tactic "Persistence / Privilege Escalation" `
@@ -379,7 +379,7 @@ Register-WFLModule `
             -Severity $Severity `
             -Category "Exchange" `
             -MITRE "T1505.003, T1505.004, T1098" `
-            -Tactic "Privilege Escalation / Persistence" `
+            -Tactic "Privilege Escalation" `
             -Source "Exchange-APT-PrivEsc-Persistence-Audit" `
             -Evidence "SuspiciousWebShells=$SuspiciousWebShellCount; NonTrustedAgents=$NonTrustedAgentsCount; AnomalousRbacMembers=$AnomalousRbacCount; AnomalousEwpMembers=$AnomalousEwpCount; CriticalRisk=$($CriticalRisk.Count); HighRisk=$($HighRisk.Count)" `
             -Recommendation "Review all high-risk findings immediately. Inspect non-trusted transport agents, verify WebShell content signals in OWA/ECP auth directories, and audit RBAC and Exchange Windows Permissions group memberships. Use Show-WFLDetails -Name Exchange-APT-PrivEsc-Persistence-Audit for complete details."

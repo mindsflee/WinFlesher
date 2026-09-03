@@ -1,6 +1,6 @@
 Register-WFLModule `
     -Name "SEC-WSUSInsecureTransport" `
-    -Category "Patch Management / Infrastructure Security" `
+    -Category "Network Security" `
     -Type "Check" `
     -MITRE "T1184" `
     -Tactic "Execution / Privilege Escalation" `
@@ -145,7 +145,7 @@ $WsusServer = "WSUS01.contoso.local"
                 Add-WFLFinding `
                     -Title "WSUS servers exposed to unencrypted transport and code injection" `
                     -Severity "Critical" `
-                    -Category "Patch Management / Infrastructure Security" `
+                    -Category "Network Security" `
                     -MITRE "T1184" `
                     -Tactic "Execution / Privilege Escalation" `
                     -Source "SEC-WSUSInsecureTransport" `
@@ -155,7 +155,7 @@ $WsusServer = "WSUS01.contoso.local"
                 Add-WFLFinding `
                     -Title "WSUS transport security check passed" `
                     -Severity "Info" `
-                    -Category "Patch Management / Infrastructure Security" `
+                    -Category "Network Security" `
                     -MITRE "T1184" `
                     -Tactic "Execution / Privilege Escalation" `
                     -Source "SEC-WSUSInsecureTransport" `
@@ -168,7 +168,7 @@ $WsusServer = "WSUS01.contoso.local"
             Add-WFLFinding `
                 -Title "WSUS security check failed" `
                 -Severity "Info" `
-                -Category "Patch Management / Infrastructure Security" `
+                -Category "Network Security" `
                 -MITRE "T1184" `
                 -Tactic "Execution / Privilege Escalation" `
                 -Source "SEC-WSUSInsecureTransport" `

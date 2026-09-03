@@ -1,6 +1,6 @@
 ﻿Register-WFLModule `
     -Name "Windows-Unquoted-Service-Paths" `
-    -Category "Windows Services" `
+    -Category "Windows Security" `
     -Type "Check" `
     -MITRE "T1574.009" `
     -Tactic "Privilege Escalation" `
@@ -28,7 +28,7 @@ Write-Host "[+] Service path for $serviceName corrected with quotes." -Foregroun
             Add-WFLFinding `
                 -Title "Service review unavailable" `
                 -Severity "Info" `
-                -Category "Windows Services" `
+                -Category "Windows Security" `
                 -MITRE "T1574.009" `
                 -Tactic "Privilege Escalation" `
                 -Source "Windows-Unquoted-Service-Paths" `
@@ -175,7 +175,7 @@ Write-Host "[+] Service path for $serviceName corrected with quotes." -Foregroun
         Add-WFLFinding `
             -Title "Potentially exploitable unquoted service paths detected" `
             -Severity $OverallSeverity `
-            -Category "Windows Services" `
+            -Category "Windows Security" `
             -MITRE "T1574.009" `
             -Tactic "Privilege Escalation" `
             -Source "Windows-Unquoted-Service-Paths" `
