@@ -176,10 +176,9 @@ Add-WindowsCapability -Online -Name Rsat.ActiveDirectory.DS-LDS.Tools~~~~0.0.1.0
         return
     }
 
-  if ($Choice -eq "3") {
+    if ($Choice -eq "3") {
         Write-Host ""
-        Write-Host "[*] Preparing Microsoft Entra ID authentication..." -ForegroundColor Cyan
-        Write-Host "[!] A web browser window will now open for authentication. Please complete the sign-in." -ForegroundColor Yellow
+        Write-Host "[*] Preparing Microsoft Entra ID authentication via Device Code..." -ForegroundColor Cyan
 
         $hasGraph = Get-Module -ListAvailable -Name "Microsoft.Graph.Applications" -ErrorAction SilentlyContinue
         $hasAzureAD = Get-Module -ListAvailable -Name "AzureAD" -ErrorAction SilentlyContinue
@@ -192,17 +191,18 @@ Add-WindowsCapability -Online -Name Rsat.ActiveDirectory.DS-LDS.Tools~~~~0.0.1.0
 
         try {
             if (Get-Command Connect-MgGraph -ErrorAction SilentlyContinue) {
-                Connect-MgGraph -Scopes "Application.Read.All", "Directory.Read.All" -NoWelcome
+                Connect-MgGraph -Scopes "Application.Read.All", "Directory.Read.All" -UseDeviceCode -NoWelcome
                 $ctx = Get-MgContext
                 if ($ctx) {
-                    Write-Host "[OK] Successfully connected to Entra ID Tenant: $($ctx.TenantId) as $($ctx.Account). Please Run Again Winflesher." -ForegroundColor Green
+                    Write-Host "[OK] Successfully connected to Entra ID Tenant: $($ctx.TenantId) as $($ctx.Account). Please restart WinFlesher." -ForegroundColor Green
                 }
             } 
             elseif (Get-Command Connect-AzureAD -ErrorAction SilentlyContinue) {
+                Write-Warning "AzureAD module does not natively support an interactive Device Code flow. Consider migrating to Microsoft.Graph."
                 Connect-AzureAD | Out-Null
                 $session = Get-AzureADCurrentSessionInfo
                 if ($session) {
-                    Write-Host "[OK] Successfully connected to AzureAD Tenant: $($session.TenantDomain). Please Run Again Winflesher." -ForegroundColor Green
+                    Write-Host "[OK] Successfully connected to AzureAD Tenant: $($session.TenantDomain). Please restart WinFlesher." -ForegroundColor Green
                 }
             }
         }
