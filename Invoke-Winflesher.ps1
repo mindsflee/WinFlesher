@@ -1,4 +1,4 @@
-﻿<#
+<#
 .SYNOPSIS
     Winflesher - Attack Surface Security Framework by mindsflee (Alessandro Salzano)
 .DESCRIPTION
@@ -191,7 +191,7 @@ Add-WindowsCapability -Online -Name Rsat.ActiveDirectory.DS-LDS.Tools~~~~0.0.1.0
 
         try {
             if (Get-Command Connect-MgGraph -ErrorAction SilentlyContinue) {
-                Connect-MgGraph -Scopes "Application.Read.All", "Directory.Read.All" -UseDeviceCode -NoWelcome
+                Connect-MgGraph -Scopes "Application.Read.All", "Directory.Read.All", "Policy.Read.All", "RoleManagement.Read.Directory", "DelegatedPermissionGrant.ReadWrite.All" -UseDeviceCode -NoWelcome
                 $ctx = Get-MgContext
                 if ($ctx) {
                     Write-Host "[OK] Successfully connected to Entra ID Tenant: $($ctx.TenantId) as $($ctx.Account). Please restart WinFlesher." -ForegroundColor Green
