@@ -820,6 +820,57 @@ function Invoke-WFLDiscovery {
         }
     }
 
+    # ---------------------------------------------------------
+    # ENTRA ID / MICROSOFT GRAPH DISCOVERY (INTEGRATED)
+    # ---------------------------------------------------------
+    $Context.EntraID = [PSCustomObject]@{
+        Available = $false
+    }
+    $Global:WinFlesher.Context.EntraIDConditionalAccessPolicies = @()
+
+    try {
+        if (Get-Module -ListAvailable -Name "Microsoft.Graph.Authentication" -ErrorAction SilentlyContinue) {
+            $mgContext = Get-MgContext -ErrorAction SilentlyContinue
+            if ($mgContext) {
+                Import-Module Microsoft.Graph.Identity.SignIns -ErrorAction SilentlyContinue
+                
+                $policies = Get-MgConditionalAccessPolicy -ErrorAction Stop
+                
+                if ($policies) {
+                    $Context.EntraID = [PSCustomObject]@{
+                        Available = $true
+                        TenantId  = $mgContext.TenantId
+                        Account   = $mgContext.Account
+                    }
+
+                    $Global:WinFlesher.Context.EntraIDConditionalAccessPolicies = @(
+                        $policies | ForEach-Object {
+                            $hasPrivExclusions = $false
+                            if ($_.Conditions.Users.ExcludeUsers -or $_.Conditions.Users.ExcludeRoles) {
+                                $hasPrivExclusions = $true
+                            }
+
+                            [PSCustomObject]@{
+                                Id                      = $_.Id
+                                DisplayName             = $_.DisplayName
+                                State                   = $_.State
+                                HasPrivilegedExclusions = $hasPrivExclusions
+                                RawPolicy               = $_
+                            }
+                        }
+                    )
+                }
+            }
+        }
+    }
+    catch {
+        $Context.EntraID = [PSCustomObject]@{
+            Available = $false
+            Error     = $_.Exception.Message
+        }
+        $Global:WinFlesher.Context.EntraIDConditionalAccessPolicies = @()
+    }
+
     $Global:WinFlesher.Context = $Context
 
     Write-WFLLog "Discovery completed" "OK"
@@ -1063,4 +1114,3 @@ Write-Host "  Show-WFLDetails -Name <detail>" -ForegroundColor Gray
 Write-Host "  Get-WFLScore" -ForegroundColor Gray
 Write-Host "  Get-WFLSummaryByCategory" -ForegroundColor Gray
 Write-Host ""
-
