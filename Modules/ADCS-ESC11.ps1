@@ -14,7 +14,8 @@
         Impact        = 'Low. Secures certificate enrollment interfaces.'
         VariableGuide = 'Registry configuration on Certification Authority servers.'
         Code          = @'
-Set-ItemProperty -Path "HKLM:\SYSTEM\CurrentControlSet\Services\CertSvc\Configuration\Parameters" -Name "RPCEncryptRequestSignature" -Value 1
+certutil -setreg CA\InterfaceFlags +IF_ENFORCEENCRYPTICERTREQUEST
+Restart-Service CertSvc
 '@
     } -Run {
 
