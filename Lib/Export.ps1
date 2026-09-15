@@ -149,28 +149,57 @@ function Export-WFLReportHtml {
         Write-Verbose "Could not retrieve target host context metadata."
     }
 
+# Global severity counters
+$TotalCritical = @($Findings | Where-Object Severity -eq "Critical").Count
+$TotalHigh     = @($Findings | Where-Object Severity -eq "High").Count
+$TotalMedium   = @($Findings | Where-Object Severity -eq "Medium").Count
+$TotalLow      = @($Findings | Where-Object Severity -eq "Low").Count
+$TotalInfo     = @($Findings | Where-Object Severity -eq "Info").Count
+
     $HealthVal = [math]::Max(0, [math]::Min(100, [double]$Score.Score))
 
-    if ($HealthVal -le 20)      { $ScoreColor = "#ef4444" }
-    elseif ($HealthVal -le 40) { $ScoreColor = "#f97316" }
-    elseif ($HealthVal -le 60) { $ScoreColor = "#eab308" }
-    elseif ($HealthVal -le 80) { $ScoreColor = "#3b82f6" }
-    else                       { $ScoreColor = "#10b981" }
+    function Get-WFLScoreColor {
+        param([double]$Value)
+        if ($Value -le 20)      { return "#ef4444" }
+        elseif ($Value -le 40) { return "#f97316" }
+        elseif ($Value -le 60) { return "#eab308" }
+        elseif ($Value -le 80) { return "#3b82f6" }
+        else                    { return "#10b981" }
+    }
 
-    Write-Verbose "Calculating offline SVG donut chart segments..."
-    $ScorePct = "{0:0.####}" -f $HealthVal
-    $RestPct  = "{0:0.####}" -f (100 - $HealthVal)
-    
-    $SvgChart = @"
+    $ScoreColor = Get-WFLScoreColor -Value $HealthVal
+
+    function New-WFLScoreDonut {
+        param([double]$Value, [string]$Color)
+        $ValPct  = "{0:0.####}" -f $Value
+        $RestPct = "{0:0.####}" -f (100 - $Value)
+        return @"
 <svg viewBox="0 0 36 36" class="donut-svg" style="transform: rotate(-90deg);">
     <circle cx="18" cy="18" r="15.915" fill="transparent" stroke="#334155" stroke-width="3.8"/>
     <circle cx="18" cy="18" r="15.915" fill="transparent" 
-            stroke="$ScoreColor" stroke-width="3.8" 
-            stroke-dasharray="$ScorePct $RestPct" 
+            stroke="$Color" stroke-width="3.8" 
+            stroke-dasharray="$ValPct $RestPct" 
             stroke-dashoffset="0" 
             stroke-linecap="round"/>
 </svg>
 "@
+    }
+
+  Write-Verbose "Retrieving Active Directory, Cloud, and Local scores from Core..."
+
+$CategoryScores = Get-WFLScore -Type All
+
+$ADScoreVal    = [double]$CategoryScores.ActiveDirectory.Score
+$CloudScoreVal = [double]$CategoryScores.Cloud.Score
+$LocalScoreVal = [double]$CategoryScores.Local.Score
+
+    $ADScoreColor    = Get-WFLScoreColor -Value $ADScoreVal
+    $CloudScoreColor = Get-WFLScoreColor -Value $CloudScoreVal
+    $LocalScoreColor = Get-WFLScoreColor -Value $LocalScoreVal
+
+    $ADSvgChart    = New-WFLScoreDonut -Value $ADScoreVal    -Color $ADScoreColor
+    $CloudSvgChart = New-WFLScoreDonut -Value $CloudScoreVal -Color $CloudScoreColor
+    $LocalSvgChart = New-WFLScoreDonut -Value $LocalScoreVal -Color $LocalScoreColor
 
     Write-Verbose "Assembling final HTML template..."
     $Html = @"
@@ -240,6 +269,10 @@ h2 {
     grid-template-columns: 320px 1fr;
     gap: 24px;
     margin-bottom: 28px;
+}
+
+.category-score-grid {
+    grid-template-columns: repeat(3, 250px) 1fr;
 }
 
 .card {
@@ -318,6 +351,8 @@ h2 {
     flex-wrap: wrap;
     gap: 8px;
     margin-top: 16px;
+    justify-content: center;
+    align-items: center;
 }
 
 .badge {
@@ -493,13 +528,33 @@ pre {
     </div>
 </div>
 
-<div class="dashboard-grid">
+<div class="dashboard-grid category-score-grid">
     <div class="card" style="display: flex; flex-direction: column; align-items: center; justify-content: center;">
         <div class="chart-container">
-            $SvgChart
+            $ADSvgChart
             <div class="chart-center-text">
-                <div class="chart-center-score">$HealthVal</div>
-                <div class="chart-center-label">Health Score</div>
+                <div class="chart-center-score" style="color: $ADScoreColor;">$ADScoreVal</div>
+                <div class="chart-center-label">Active Directory</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card" style="display: flex; flex-direction: column; align-items: center; justify-content: center;">
+        <div class="chart-container">
+            $CloudSvgChart
+            <div class="chart-center-text">
+                <div class="chart-center-score" style="color: $CloudScoreColor;">$CloudScoreVal</div>
+                <div class="chart-center-label">Cloud</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card" style="display: flex; flex-direction: column; align-items: center; justify-content: center;">
+        <div class="chart-container">
+            $LocalSvgChart
+            <div class="chart-center-text">
+                <div class="chart-center-score" style="color: $LocalScoreColor;">$LocalScoreVal</div>
+                <div class="chart-center-label">Local</div>
             </div>
         </div>
     </div>
@@ -527,15 +582,27 @@ pre {
             </div>
         </div>
 
-        <div>
-            <span class="label" style="font-size: 11px; text-transform: uppercase; color: var(--text-secondary);">Findings Overview (Rating: $($Score.Rating))</span>
-            <div class="badge-list">
-                <span class="badge badge-critical">Critical: $($Score.Critical)</span>
-                <span class="badge badge-high">High: $($Score.High)</span>
-                <span class="badge badge-medium">Medium: $($Score.Medium)</span>
-                <span class="badge badge-low">Low: $($Score.Low)</span>
-                <span class="badge badge-info">Info: $($Score.Info)</span>
-            </div>
+       <div class="badge-list">
+    <span class="badge badge-critical">
+        Critical: $TotalCritical
+    </span>
+
+    <span class="badge badge-high">
+        High: $TotalHigh
+    </span>
+
+    <span class="badge badge-medium">
+        Medium: $TotalMedium
+    </span>
+
+    <span class="badge badge-low">
+        Low: $TotalLow
+    </span>
+
+    <span class="badge badge-info">
+        Info: $TotalInfo
+    </span>
+</div>
         </div>
     </div>
 </div>
