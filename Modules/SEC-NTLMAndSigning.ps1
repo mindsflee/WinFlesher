@@ -1,6 +1,6 @@
 Register-WFLModule `
     -Name "SEC-NTLMAndSigning" `
-    -Category "Network Security" `
+    -Category "Active Directory" `
     -Type "Check" `
     -MITRE "T1557" `
     -Tactic "Credential Access" `
@@ -102,7 +102,7 @@ Set-ItemProperty -Path "HKLM:\SYSTEM\CurrentControlSet\Services\LanmanServer\Par
             Add-WFLFinding `
                 -Title "Domain-Wide NTLM & LDAP Protocol Hardening Audit" `
                 -Severity $Severity `
-                -Category "Network Security" `
+                -Category "Active Directory" `
                 -MITRE "T1557" `
                 -Tactic "Credential Access" `
                 -Source "SEC-NTLMAndSigning" `
