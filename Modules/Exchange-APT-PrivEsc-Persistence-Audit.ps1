@@ -1,6 +1,6 @@
 Register-WFLModule `
     -Name "Exchange-APT-PrivEsc-Persistence-Audit" `
-    -Category "Privilege Escalation" `
+    -Category "Active Directory" `
     -Type "Check" `
     -MITRE "T1505.003, T1505.004, T1098" `
     -Tactic "Persistence / Privilege Escalation" `
@@ -377,7 +377,7 @@ Register-WFLModule `
         Add-WFLFinding `
             -Title "Exchange APT Privilege Escalation, WebShell & Persistence Audit" `
             -Severity $Severity `
-            -Category "Exchange" `
+            -Category "Active Directory" `
             -MITRE "T1505.003, T1505.004, T1098" `
             -Tactic "Privilege Escalation" `
             -Source "Exchange-APT-PrivEsc-Persistence-Audit" `
@@ -388,7 +388,7 @@ Register-WFLModule `
         Add-WFLFinding `
             -Title "Exchange APT PrivEsc audit failed" `
             -Severity "Info" `
-            -Category "Exchange" `
+            -Category "Active Directory" `
             -MITRE "T1505.003" `
             -Tactic "Privilege Escalation" `
             -Source "Exchange-APT-PrivEsc-Persistence-Audit" `
