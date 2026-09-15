@@ -12,7 +12,7 @@
         Type          = 'Specific'
         Description   = 'Fix unquoted Windows service paths containing spaces.'
         Impact        = 'Prevents arbitrary code execution via service path binary hijacking.'
-        VariableGuide = 'Set [Nome_Servizio] to the vulnerable service identified.'
+        VariableGuide = 'Set [Service_Name] to the vulnerable service identified.'
         Code          = @'
 $serviceName = "[Nome_Servizio]"
 $service = Get-WmiObject Win32_Service -Filter "Name='$serviceName'"
