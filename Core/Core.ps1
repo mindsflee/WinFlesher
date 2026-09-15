@@ -884,74 +884,93 @@ function Show-WFLContext {
 
 
 function Get-WFLScore {
+    [CmdletBinding()]
+    param(
+        [ValidateSet("ActiveDirectory", "Cloud", "Local", "All")]
+        [string]$Type = "All"
+    )
 
-    $Score = 100
+    $Findings = $Global:WinFlesher.Findings
 
-    foreach($Finding in $Global:WinFlesher.Findings)
-    {
-        switch($Finding.Severity)
-        {
-            "Critical" { $Score -= 7.5 }
-            "High"     { $Score -= 4 }
-            "Medium"   { $Score -= 1 }
-            "Low"      { $Score -= 0.25 }
+    $ADFindings    = @($Findings | Where-Object { $_.Category -match "Active Directory" })
+    $CloudFindings = @($Findings | Where-Object { $_.Category -match "Cloud" })
+    $LocalFindings = @($Findings | Where-Object { $_.Category -notmatch "Active Directory" -and $_.Category -notmatch "Cloud" })
+
+    $ADScore = 100
+    foreach($f in $ADFindings) {
+        switch($f.Severity) {
+            "Critical" { $ADScore -= 10 }
+            "High"     { $ADScore -= 5 }
+            "Medium"   { $ADScore -= 2 }
+            "Low"      { $ADScore -= 0.5 }
         }
     }
+    if($ADScore -lt 0) { $ADScore = 0 }
 
-    if($Score -lt 0)
-    {
-        $Score = 0
+    $CloudScore = 100
+    foreach($f in $CloudFindings) {
+        switch($f.Severity) {
+            "Critical" { $CloudScore -= 10 }
+            "High"     { $CloudScore -= 5 }
+            "Medium"   { $CloudScore -= 2 }
+            "Low"      { $CloudScore -= 0.5 }
+        }
+    }
+    if($CloudScore -lt 0) { $CloudScore = 0 }
+
+    $LocalScore = 100
+    foreach($f in $LocalFindings) {
+        switch($f.Severity) {
+            "Critical" { $LocalScore -= 10 }
+            "High"     { $LocalScore -= 5 }
+            "Medium"   { $LocalScore -= 2 }
+            "Low"      { $LocalScore -= 0.5 }
+        }
+    }
+    if($LocalScore -lt 0) { $LocalScore = 0 }
+
+    $ADObj = [PSCustomObject]@{
+        Score    = $ADScore
+        Findings = $ADFindings.Count
+        Critical = @($ADFindings | Where-Object { $_.Severity -eq "Critical" }).Count
+        High     = @($ADFindings | Where-Object { $_.Severity -eq "High" }).Count
+        Medium   = @($ADFindings | Where-Object { $_.Severity -eq "Medium" }).Count
+        Low      = @($ADFindings | Where-Object { $_.Severity -eq "Low" }).Count
+        Info     = @($ADFindings | Where-Object { $_.Severity -eq "Info" }).Count
     }
 
-    $Critical = @(
-        $Global:WinFlesher.Findings |
-        Where-Object { $_.Severity -eq "Critical" }
-    ).Count
-
-    $High = @(
-        $Global:WinFlesher.Findings |
-        Where-Object { $_.Severity -eq "High" }
-    ).Count
-
-    $Medium = @(
-        $Global:WinFlesher.Findings |
-        Where-Object { $_.Severity -eq "Medium" }
-    ).Count
-
-    $Low = @(
-        $Global:WinFlesher.Findings |
-        Where-Object { $_.Severity -eq "Low" }
-    ).Count
-
-    $Info = @(
-        $Global:WinFlesher.Findings |
-        Where-Object { $_.Severity -eq "Info" }
-    ).Count
-
-    $Rating = "Bulletproof"
-
-    if($Score -lt 50)
-    {
-        $Rating = "Cooked"
-    }
-    elseif($Score -lt 70)
-    {
-        $Rating = "Bleeding"
-    }
-    elseif($Score -lt 85)
-    {
-        $Rating = "Solid"
+    $CloudObj = [PSCustomObject]@{
+        Score    = $CloudScore
+        Findings = $CloudFindings.Count
+        Critical = @($CloudFindings | Where-Object { $_.Severity -eq "Critical" }).Count
+        High     = @($CloudFindings | Where-Object { $_.Severity -eq "High" }).Count
+        Medium   = @($CloudFindings | Where-Object { $_.Severity -eq "Medium" }).Count
+        Low      = @($CloudFindings | Where-Object { $_.Severity -eq "Low" }).Count
+        Info     = @($CloudFindings | Where-Object { $_.Severity -eq "Info" }).Count
     }
 
-    [PSCustomObject]@{
-        Score    = $Score
-        Rating   = $Rating
-        Findings = $Global:WinFlesher.Findings.Count
-        Critical = $Critical
-        High     = $High
-        Medium   = $Medium
-        Low      = $Low
-        Info     = $Info
+    $LocalObj = [PSCustomObject]@{
+        Score    = $LocalScore
+        Findings = $LocalFindings.Count
+        Critical = @($LocalFindings | Where-Object { $_.Severity -eq "Critical" }).Count
+        High     = @($LocalFindings | Where-Object { $_.Severity -eq "High" }).Count
+        Medium   = @($LocalFindings | Where-Object { $_.Severity -eq "Medium" }).Count
+        Low      = @($LocalFindings | Where-Object { $_.Severity -eq "Low" }).Count
+        Info     = @($LocalFindings | Where-Object { $_.Severity -eq "Info" }).Count
+    }
+
+    switch ($Type) {
+        "ActiveDirectory" { return $ADObj }
+        "Cloud"           { return $CloudObj }
+        "Local"           { return $LocalObj }
+        default {
+            [PSCustomObject]@{
+                ActiveDirectory = $ADObj
+                Cloud           = $CloudObj
+                Local           = $LocalObj
+                TotalFindings   = $Findings.Count
+            }
+        }
     }
 }
 
@@ -1014,7 +1033,7 @@ function Start-WFLAssessment {
 
     Invoke-WFLAllModules
 
-    Get-WFLScore
+    $null = Get-WFLScore
 }
 
 
