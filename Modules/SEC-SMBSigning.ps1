@@ -1,6 +1,6 @@
 ﻿Register-WFLModule `
     -Name "SEC-SMBSigning" `
-    -Category "Network Security" `
+    -Category "Local" `
     -Type "Check" `
     -MITRE "T1557" `
     -Tactic "Credential Access" `
@@ -159,7 +159,7 @@ Set-ItemProperty -Path "HKLM:\SYSTEM\CurrentControlSet\Services\LanmanWorkstatio
                 Add-WFLFinding `
                     -Title "SMB signing review incomplete" `
                     -Severity "Low" `
-                    -Category "Network Security" `
+                    -Category "Local" `
                     -MITRE "T1557" `
                     -Tactic "Credential Access" `
                     -Source "SEC-SMBSigning" `
@@ -172,7 +172,7 @@ Set-ItemProperty -Path "HKLM:\SYSTEM\CurrentControlSet\Services\LanmanWorkstatio
                 Add-WFLFinding `
                     -Title "SMB signing review passed" `
                     -Severity "Info" `
-                    -Category "Network Security" `
+                    -Category "Local" `
                     -MITRE "T1557" `
                     -Tactic "Credential Access" `
                     -Source "SEC-SMBSigning" `
@@ -184,7 +184,7 @@ Set-ItemProperty -Path "HKLM:\SYSTEM\CurrentControlSet\Services\LanmanWorkstatio
             Add-WFLFinding `
                 -Title "SMB signing baseline gaps detected" `
                 -Severity $Severity `
-                -Category "Network Security" `
+                -Category "Local" `
                 -MITRE "T1557" `
                 -Tactic "Credential Access" `
                 -Source "SEC-SMBSigning" `
@@ -196,7 +196,7 @@ Set-ItemProperty -Path "HKLM:\SYSTEM\CurrentControlSet\Services\LanmanWorkstatio
             Add-WFLFinding `
                 -Title "SMB signing review failed" `
                 -Severity "Info" `
-                -Category "Network Security" `
+                -Category "Local" `
                 -MITRE "T1557" `
                 -Tactic "Credential Access" `
                 -Source "SEC-SMBSigning" `
