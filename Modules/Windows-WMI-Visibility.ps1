@@ -1,6 +1,6 @@
 ﻿Register-WFLModule `
     -Name "Windows-WMI-Visibility" `
-    -Category "Logging" `
+    -Category "Local" `
     -Type "Check" `
     -MITRE "T1047" `
     -Tactic "Execution" `
@@ -58,7 +58,7 @@ Get-CimInstance -Namespace root\subscription -ClassName __EventFilter | Remove-C
         Add-WFLFinding `
             -Title "WMI visibility review" `
             -Severity $FindingSeverity `
-            -Category "Logging" `
+            -Category "Local" `
             -MITRE "T1047" `
             -Tactic "Execution" `
             -Source "Windows-WMI-Visibility" `
