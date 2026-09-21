@@ -8,7 +8,7 @@
     -Description "Fast audit of active processes owned by Domain Admin / Tier-0 accounts suitable for token theft." `
 -Remediation @{
         Module        = 'LPE-TokenHijack.ps1'
-        Category      = 'Local Privilege Escalation'
+        Category      = 'Active Directory'
         Type          = 'Specific'
         Description   = 'Restrict debugging permissions and user rights auditing to prevent Token Impersonation techniques.'
         Impact        = 'Reduces the risk of access token theft (e.g., SeDebugPrivilege) by unauthorized processes.'
