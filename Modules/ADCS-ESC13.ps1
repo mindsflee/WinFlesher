@@ -1,6 +1,6 @@
 ﻿Register-WFLModule `
     -Name "ADCS-ESC13" `
-    -Category "Active Directory Certificate Services" `
+    -Category "Active Directory" `
     -Type "Check" `
     -MITRE "T1649" `
     -Tactic "Credential Access" `
@@ -77,7 +77,7 @@ if ($Interesting.Count -gt 0)
             Add-WFLFinding `
                 -Title "AD CS ESC13 template review" `
                 -Severity $Severity `
-                -Category "Active Directory Certificate Services" `
+                -Category "Active Directory" `
                 -Source "ADCS-ESC13" `
                 -Evidence "TemplatesReviewed=$($Interesting.Count)" `
                 -Recommendation "Review certificate-to-group mappings and privileged authentication templates."
@@ -87,7 +87,7 @@ if ($Interesting.Count -gt 0)
             Add-WFLFinding `
                 -Title "AD CS ESC13 review failed" `
                 -Severity "Info" `
-                -Category "Active Directory Certificate Services" `
+                -Category "Active Directory" `
                 -Source "ADCS-ESC13" `
                 -Evidence $_.Exception.Message
         }
