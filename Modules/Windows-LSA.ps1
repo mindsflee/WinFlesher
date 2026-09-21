@@ -1,6 +1,6 @@
 ﻿Register-WFLModule `
     -Name "Windows-LSA" `
-    -Category "Windows Security" `
+    -Category "Local" `
     -Type "Check" `
     -MITRE "T1003.001" `
     -Tactic "Credential Access" `
@@ -51,7 +51,7 @@ Write-Host "[+] WDigest authentication disabled successfully." -ForegroundColor 
             Add-WFLFinding `
                 -Title "LSA / LSASS protection review" `
                 -Severity "High" `
-                -Category "Windows Security" `
+                -Category "Local" `
                 -MITRE "T1003.001" `
                 -Tactic "Credential Access" `
                 -Source "Windows-LSA" `
@@ -62,7 +62,7 @@ Write-Host "[+] WDigest authentication disabled successfully." -ForegroundColor 
             Add-WFLFinding `
                 -Title "LSA / LSASS protection review passed" `
                 -Severity "Info" `
-                -Category "Windows Security" `
+                -Category "Local" `
                 -MITRE "T1003.001" `
                 -Tactic "Credential Access" `
                 -Source "Windows-LSA" `
