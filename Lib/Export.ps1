@@ -169,15 +169,20 @@ $TotalInfo     = @($Findings | Where-Object Severity -eq "Info").Count
 
     $ScoreColor = Get-WFLScoreColor -Value $HealthVal
 
-    function New-WFLScoreDonut {
+function New-WFLScoreDonut {
         param([double]$Value, [string]$Color)
-        $ValPct  = "{0:0.####}" -f $Value
-        $RestPct = "{0:0.####}" -f (100 - $Value)
+        # Assicuriamoci che il valore sia compreso tra 0 e 100
+        $SafeVal = [math]::Max(0, [math]::Min(100, $Value))
+        $ValPct  = "{0:0.####}" -f $SafeVal
+        $RestPct = "{0:0.####}" -f (100 - $SafeVal)
+        
         return @"
 <svg viewBox="0 0 36 36" class="donut-svg" style="transform: rotate(-90deg);">
+  
     <circle cx="18" cy="18" r="15.915" fill="transparent" stroke="#334155" stroke-width="3.8"/>
     <circle cx="18" cy="18" r="15.915" fill="transparent" 
             stroke="$Color" stroke-width="3.8" 
+            pathLength="100"
             stroke-dasharray="$ValPct $RestPct" 
             stroke-dashoffset="0" 
             stroke-linecap="round"/>
