@@ -171,7 +171,7 @@ $TotalInfo     = @($Findings | Where-Object Severity -eq "Info").Count
 
 function New-WFLScoreDonut {
         param([double]$Value, [string]$Color)
-        # Assicuriamoci che il valore sia compreso tra 0 e 100
+    
         $SafeVal = [math]::Max(0, [math]::Min(100, $Value))
         $ValPct  = "{0:0.####}" -f $SafeVal
         $RestPct = "{0:0.####}" -f (100 - $SafeVal)
@@ -190,35 +190,60 @@ function New-WFLScoreDonut {
 "@
     }
 
-    function Get-WFLSafeCategoryScore {
-        param($CategoryData)
-        if ($null -eq $CategoryData -or $null -eq $CategoryData.Score) {
+function Get-WFLSafeCategoryScore {
+        param($CategoryData, $CategoryName)
+        
+       
+        if ($CategoryName -eq "Cloud") {
+            $isCloudActive = $false
+
+          
+            if ($Global:WinFlesher -and $Global:WinFlesher.Context -and $Global:WinFlesher.Context.EntraID -and $Global:WinFlesher.Context.EntraID.Available -eq $true) {
+                $isCloudActive = $true
+            }
+          
+            elseif (Get-Command Get-MgContext -ErrorAction SilentlyContinue) {
+                $mgCtx = Get-MgContext -ErrorAction SilentlyContinue
+                if ($null -ne $mgCtx) {
+                    $isCloudActive = $true
+                }
+            }
+
+      
+            if (-not $isCloudActive) {
+                return [PSCustomObject]@{ Value = "N/A"; Color = "#475569"; Svg = (New-WFLScoreDonut -Value 0 -Color "#475569") }
+            }
+        }
+
+      
+        if ($null -eq $CategoryData -or -not $CategoryData.PSObject.Properties['Score'] -or $null -eq $CategoryData.Score -or $CategoryData.Score -eq "") {
             return [PSCustomObject]@{ Value = "N/A"; Color = "#475569"; Svg = (New-WFLScoreDonut -Value 0 -Color "#475569") }
         }
+
         $val = [double]$CategoryData.Score
         $col = Get-WFLScoreColor -Value $val
         return [PSCustomObject]@{ Value = $val; Color = $col; Svg = (New-WFLScoreDonut -Value $val -Color $col) }
     }
 
-Write-Verbose "Retrieving Active Directory, Cloud, and Local scores from Core..."
+    Write-Verbose "Retrieving Active Directory, Cloud, and Local scores from Core..."
 
-$CategoryScores = Get-WFLScore -Type All
+    $CategoryScores = Get-WFLScore -Type All
 
-$ADScore    = Get-WFLSafeCategoryScore -CategoryData $CategoryScores.ActiveDirectory
-$CloudScore = Get-WFLSafeCategoryScore -CategoryData $CategoryScores.Cloud
-$LocalScore = Get-WFLSafeCategoryScore -CategoryData $CategoryScores.Local
+    $ADScore    = Get-WFLSafeCategoryScore -CategoryData $CategoryScores.ActiveDirectory -CategoryName "ActiveDirectory"
+    $CloudScore = Get-WFLSafeCategoryScore -CategoryData $CategoryScores.Cloud -CategoryName "Cloud"
+    $LocalScore = Get-WFLSafeCategoryScore -CategoryData $CategoryScores.Local -CategoryName "Local"
 
-$ADScoreVal    = $ADScore.Value
-$ADScoreColor  = $ADScore.Color
-$ADSvgChart    = $ADScore.Svg
+    $ADScoreVal    = $ADScore.Value
+    $ADScoreColor  = $ADScore.Color
+    $ADSvgChart    = $ADScore.Svg
 
-$CloudScoreVal   = $CloudScore.Value
-$CloudScoreColor = $CloudScore.Color
-$CloudSvgChart   = $CloudScore.Svg
+    $CloudScoreVal   = $CloudScore.Value
+    $CloudScoreColor = $CloudScore.Color
+    $CloudSvgChart   = $CloudScore.Svg
 
-$LocalScoreVal   = $LocalScore.Value
-$LocalScoreColor = $LocalScore.Color
-$LocalSvgChart   = $LocalScore.Svg
+    $LocalScoreVal   = $LocalScore.Value
+    $LocalScoreColor = $LocalScore.Color
+    $LocalSvgChart   = $LocalScore.Svg
 
     Write-Verbose "Assembling final HTML template..."
     $Html = @"
