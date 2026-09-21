@@ -1,6 +1,6 @@
 ﻿Register-WFLModule `
     -Name "Security-Defender-Status" `
-    -Category "Endpoint Security" `
+    -Category "Local" `
     -Type "Check" `
     -MITRE "T1562.001" `
     -Tactic "Defense Evasion" `
@@ -32,7 +32,7 @@ Set-MpPreference -DisableRealtimeMonitoring $false -DisableBehaviorMonitoring $f
             Add-WFLFinding `
                 -Title "Microsoft Defender status unavailable" `
                 -Severity "Info" `
-                -Category "Endpoint Security" `
+                -Category "Local" `
                 -Source "Security-Defender-Status" `
                 -Evidence "Get-MpComputerStatus unavailable or Defender not present." `
                 -Recommendation "Verify whether Defender is disabled, unavailable, or intentionally secondary behind another EDR."
@@ -58,7 +58,7 @@ Set-MpPreference -DisableRealtimeMonitoring $false -DisableBehaviorMonitoring $f
             Add-WFLFinding `
                 -Title "Microsoft Defender protection gaps detected" `
                 -Severity "Low" `
-                -Category "Endpoint Security" `
+                -Category "Local" `
                 -Source "Security-Defender-Status" `
                 -Evidence ($Issues -join " | ") `
                 -Recommendation "Enable Defender protections where compatible or verify equivalent coverage from the primary EDR."
@@ -68,7 +68,7 @@ Set-MpPreference -DisableRealtimeMonitoring $false -DisableBehaviorMonitoring $f
             Add-WFLFinding `
                 -Title "Microsoft Defender status review passed" `
                 -Severity "Info" `
-                -Category "Endpoint Security" `
+                -Category "Local" `
                 -Source "Security-Defender-Status" `
                 -Evidence "RealTimeProtection=$($Def.RealTimeProtectionEnabled); TamperProtection=$($Def.IsTamperProtected)" `
                 -Recommendation "Keep protections enabled and monitored."
