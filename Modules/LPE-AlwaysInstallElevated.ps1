@@ -1,6 +1,6 @@
 ﻿Register-WFLModule `
     -Name "LPE-AlwaysInstallElevated" `
-    -Category "Privilege Escalation" `
+    -Category "Local" `
     -Type "Check" `
     -MITRE "T1546.015" `
     -Tactic "Privilege Escalation" `
@@ -68,7 +68,7 @@ Write-Host "[+] AlwaysInstallElevated policy disabled successfully." -Foreground
         Add-WFLFinding `
             -Title "AlwaysInstallElevated privilege escalation exposure" `
             -Severity $Severity `
-            -Category "Privilege Escalation" `
+            -Category "Local" `
             -MITRE "T1546.015" `
             -Tactic "Privilege Escalation" `
             -Source "LPE-AlwaysInstallElevated" `
