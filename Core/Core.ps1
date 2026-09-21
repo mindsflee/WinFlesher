@@ -921,9 +921,9 @@ function Get-WFLScore {
     $LocalScore = 100
     foreach($f in $LocalFindings) {
         switch($f.Severity) {
-            "Critical" { $LocalScore -= 10 }
-            "High"     { $LocalScore -= 5 }
-            "Medium"   { $LocalScore -= 2 }
+            "Critical" { $LocalScore -= 20 }
+            "High"     { $LocalScore -= 10 }
+            "Medium"   { $LocalScore -= 5 }
             "Low"      { $LocalScore -= 0.5 }
         }
     }
