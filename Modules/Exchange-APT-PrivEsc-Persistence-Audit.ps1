@@ -42,7 +42,7 @@ Register-WFLModule `
             Add-WFLFinding `
                 -Title "Exchange APT Audit unavailable" `
                 -Severity "Info" `
-                -Category "Exchange" `
+                -Category "Active Directory" `
                 -MITRE "T1505.003" `
                 -Tactic "Persistence" `
                 -Source "Exchange-APT-PrivEsc-Persistence-Audit" `
