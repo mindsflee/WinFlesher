@@ -1,6 +1,6 @@
 ﻿Register-WFLModule `
     -Name "Windows-Firewall-Baseline" `
-    -Category "Network Security" `
+    -Category "Local" `
     -Type "Check" `
     -MITRE "T1562.004" `
     -Tactic "Defense Evasion" `
@@ -48,7 +48,7 @@ Set-NetFirewallProfile -Profile Domain,Private,Public -Enabled True -DefaultInbo
         Add-WFLFinding `
             -Title "Windows Firewall baseline review" `
             -Severity $Severity `
-            -Category "Network Security" `
+            -Category "Local" `
             -Source "Windows-Firewall-Baseline" `
             -Evidence "Profiles=$(@($Profiles).Count); Disabled=$(@($Disabled).Count); InboundNotBlock=$(@($InboundNotBlock).Count)" `
             -Recommendation "Enable firewall profiles and prefer default inbound Block with explicit allow rules where compatible."
