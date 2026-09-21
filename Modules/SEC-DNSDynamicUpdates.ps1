@@ -1,6 +1,6 @@
 Register-WFLModule `
     -Name "SEC-DNSDynamicUpdates" `
-    -Category "Network Security" `
+    -Category "Local" `
     -Type "Check" `
     -MITRE "T1557" `
     -Tactic "Credential Access" `
@@ -290,7 +290,7 @@ else {
                 Add-WFLFinding `
                     -Title "DNS dynamic update review incomplete" `
                     -Severity "Low" `
-                    -Category "Network Security" `
+                    -Category "Local" `
                     -MITRE "T1557" `
                     -Tactic "Credential Access" `
                     -Source "SEC-DNSDynamicUpdates" `
@@ -304,7 +304,7 @@ else {
                 Add-WFLFinding `
                     -Title "DNS dynamic update security review passed" `
                     -Severity "Info" `
-                    -Category "Network Security" `
+                    -Category "Local" `
                     -MITRE "T1557" `
                     -Tactic "Credential Access" `
                     -Source "SEC-DNSDynamicUpdates" `
@@ -331,7 +331,7 @@ else {
             Add-WFLFinding `
                 -Title "DNS zones accept non-secure dynamic updates" `
                 -Severity "High" `
-                -Category "Network Security" `
+                -Category "Local" `
                 -MITRE "T1557" `
                 -Tactic "Credential Access" `
                 -Source "SEC-DNSDynamicUpdates" `
@@ -343,7 +343,7 @@ else {
             Add-WFLFinding `
                 -Title "DNS dynamic update review failed" `
                 -Severity "Info" `
-                -Category "Network Security" `
+                -Category "Local" `
                 -MITRE "T1557" `
                 -Tactic "Credential Access" `
                 -Source "SEC-DNSDynamicUpdates" `
