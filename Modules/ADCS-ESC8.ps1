@@ -1,6 +1,6 @@
 ﻿Register-WFLModule `
     -Name "ADCS-ESC8" `
-    -Category "Active Directory Certificate Services" `
+    -Category "Active Directory" `
     -Type "Check" `
     -MITRE "T1649" `
     -Tactic "Credential Access" `
@@ -103,7 +103,7 @@ Disable-WindowsOptionalFeature -Online -FeatureName "CertificateServicesWebEnrol
             Add-WFLFinding `
                 -Title "AD CS ESC8 HTTP enrollment endpoint review" `
                 -Severity $Severity `
-                -Category "Active Directory Certificate Services" `
+                -Category "Active Directory" `
                 -MITRE "T1649" `
                 -Tactic "Credential Access" `
                 -Source "ADCS-ESC8" `
@@ -114,7 +114,7 @@ Disable-WindowsOptionalFeature -Online -FeatureName "CertificateServicesWebEnrol
             Add-WFLFinding `
                 -Title "AD CS ESC8 review failed" `
                 -Severity "Info" `
-                -Category "Active Directory Certificate Services" `
+                -Category "Active Directory" `
                 -Source "ADCS-ESC8" `
                 -Evidence $_.Exception.Message
         }
