@@ -1,6 +1,6 @@
 ﻿Register-WFLModule `
     -Name "ADCS-ESC4" `
-    -Category "Active Directory Certificate Services" `
+    -Category "Active Directory" `
     -Type "Check" `
     -MITRE "T1649" `
     -Tactic "Credential Access" `
@@ -109,7 +109,7 @@ elseif (($ExposedTemplates | Where-Object { $_.Severity -eq "Medium" }).Count -g
             Add-WFLFinding `
                 -Title "AD CS ESC4 Template Misconfiguration Review" `
                 -Severity $Severity `
-                -Category "Active Directory Certificate Services" `
+                -Category "Active Directory" `
                 -MITRE "T1649" `
                 -Tactic "Credential Access" `
                 -Source "ADCS-ESC4" `
@@ -117,7 +117,7 @@ elseif (($ExposedTemplates | Where-Object { $_.Severity -eq "Medium" }).Count -g
                 -Recommendation "Restrict WriteOwner, WriteDacl, and WriteProperty permissions on Certificate Templates to Enterprise/Domain Admins only."
         }
         catch {
-            Add-WFLFinding -Title "ADCS ESC4 review failed" -Severity "Info" -Category "Active Directory Certificate Services" -Source "ADCS-ESC4" -Evidence $_.Exception.Message
+            Add-WFLFinding -Title "ADCS ESC4 review failed" -Severity "Info" -Category "Active Directory" -Source "ADCS-ESC4" -Evidence $_.Exception.Message
         }
     }
 
