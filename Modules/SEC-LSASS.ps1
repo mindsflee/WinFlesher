@@ -1,6 +1,6 @@
 ﻿Register-WFLModule `
     -Name "SEC-LSASS" `
-    -Category "Windows Security" `
+    -Category "Local" `
     -Type "Check" `
     -MITRE "T1003.001" `
     -Tactic "Credential Access" `
@@ -59,7 +59,7 @@ Write-Host "[+] LSASS protection (RunAsPPL) enabled. System restart required." -
             Add-WFLFinding `
                 -Title "LSASS Process Protection (RunAsPPL) Audit" `
                 -Severity $Severity `
-                -Category "Windows Security" `
+                -Category "Local" `
                 -MITRE "T1003.001" `
                 -Tactic "Credential Access" `
                 -Source "SEC-LSASS" `
@@ -70,7 +70,7 @@ Write-Host "[+] LSASS protection (RunAsPPL) enabled. System restart required." -
             Add-WFLFinding `
                 -Title "LSASS protection check failed" `
                 -Severity "Info" `
-                -Category "Windows Security" `
+                -Category "Local" `
                 -Source "SEC-LSASS" `
                 -Evidence $_.Exception.Message
         }
