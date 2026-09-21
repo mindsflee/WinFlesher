@@ -56,7 +56,7 @@ Write-Host "[+] AlwaysInstallElevated policy disabled successfully." -Foreground
             Add-WFLFinding `
                 -Title "AlwaysInstallElevated review passed" `
                 -Severity "Info" `
-                -Category "Privilege Escalation" `
+                -Category "Local" `
                 -Source "LPE-AlwaysInstallElevated" `
                 -Evidence "AlwaysInstallElevated policies are not enabled."
 
