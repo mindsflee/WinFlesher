@@ -1,6 +1,6 @@
 ﻿Register-WFLModule `
     -Name "ADCS-ESC1" `
-    -Category "Active Directory Certificate Services" `
+    -Category "Active Directory" `
     -Type "Check" `
     -MITRE "T1649" `
     -Tactic "Credential Access" `
@@ -21,7 +21,7 @@
             Add-WFLFinding `
                 -Title "ADCS ESC1 review unavailable" `
                 -Severity "Info" `
-                -Category "Active Directory Certificate Services" `
+                -Category "Active Directory" `
                 -Source "ADCS-ESC1" `
                 -Evidence "Active Directory discovery unavailable."
             return
@@ -153,7 +153,7 @@
             Add-WFLFinding `
                 -Title "AD CS ESC1 template exposure review" `
                 -Severity $Severity `
-                -Category "Active Directory Certificate Services" `
+                -Category "Active Directory" `
                 -MITRE "T1649" `
                 -Tactic "Credential Access" `
                 -Source "ADCS-ESC1" `
@@ -164,7 +164,7 @@
             Add-WFLFinding `
                 -Title "AD CS ESC1 review failed" `
                 -Severity "Info" `
-                -Category "Active Directory Certificate Services" `
+                -Category "Active Directory" `
                 -Source "ADCS-ESC1" `
                 -Evidence $_.Exception.Message
         }
