@@ -15,7 +15,7 @@ Register-WFLModule `
         VariableGuide = '$Identity: The transport agent name, suspicious file path, RBAC member, or security principal holding validated dangerous AD integration rights.'
         Code          = @'
 # Remove-Item -Path "C:\Program Files\Microsoft\Exchange Server\V15\FrontEnd\HttpProxy\owa\auth\webshell.aspx" -Force
-# Uninstall-TransportAgent -Identity "NomeAgentSospetto"
+# Uninstall-TransportAgent -Identity "Name"
 # Remove-RoleGroupMember -Identity "Organization Management" -Member "UserName" -Confirm:$false
 # Remove-ADGroupMember -Identity "Exchange Windows Permissions" -Member "UserName" -Confirm:$false
 '@
