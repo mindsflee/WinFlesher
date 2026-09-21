@@ -28,7 +28,7 @@ Write-Host "[+] Debug privileges restricted to the Administrators group." -Foreg
             Add-WFLFinding `
                 -Title "Token hijack review skipped" `
                 -Severity "Info" `
-                -Category "Privilege Escalation" `
+                -Category "Active Directory" `
                 -MITRE "T1134.001" `
                 -Tactic "Privilege Escalation" `
                 -Source "LPE-TokenHijack" `
