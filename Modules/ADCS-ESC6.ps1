@@ -1,6 +1,6 @@
 ﻿Register-WFLModule `
     -Name "ADCS-ESC6" `
-    -Category "Active Directory Certificate Services" `
+    -Category "Active Directory Certificate" `
     -Type "Check" `
     -MITRE "T1649" `
     -Tactic "Credential Access" `
@@ -69,7 +69,7 @@ certutil.exe -setreg CA\EditFlags -EDITF_ATTRIBUTESUBJECTALTNAME2
             Add-WFLFinding `
                 -Title "AD CS ESC6 SAN Configuration Review" `
                 -Severity $Severity `
-                -Category "Active Directory Certificate Services" `
+                -Category "Active Directory" `
                 -MITRE "T1649" `
                 -Tactic "Credential Access" `
                 -Source "ADCS-ESC6" `
@@ -80,7 +80,7 @@ certutil.exe -setreg CA\EditFlags -EDITF_ATTRIBUTESUBJECTALTNAME2
             Add-WFLFinding `
                 -Title "AD CS ESC6 review failed" `
                 -Severity "Info" `
-                -Category "Active Directory Certificate Services" `
+                -Category "Active Directory" `
                 -Source "ADCS-ESC6" `
                 -Evidence $_.Exception.Message
         }
