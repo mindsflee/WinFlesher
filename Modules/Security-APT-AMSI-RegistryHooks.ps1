@@ -1,6 +1,6 @@
 ﻿Register-WFLModule `
     -Name "Security-APT-AMSI-RegistryHooks" `
-    -Category "Defense Evasion" `
+    -Category "Local" `
     -Type "Check" `
     -MITRE "T1562.001" `
     -Tactic "Defense Evasion" `
@@ -77,7 +77,7 @@ Remove-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\AMSIProviders" -Name "BadPro
             Add-WFLFinding `
                 -Title "AMSI Defense Evasion or registry tampering detected" `
                 -Severity "High" `
-                -Category "Defense Evasion" `
+                -Category "Local" `
                 -MITRE "T1562.001" `
                 -Tactic "Defense Evasion" `
                 -Source "Security-APT-AMSI-RegistryHooks" `
@@ -88,7 +88,7 @@ Remove-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\AMSIProviders" -Name "BadPro
             Add-WFLFinding `
                 -Title "AMSI registry integrity review passed" `
                 -Severity "Info" `
-                -Category "Defense Evasion" `
+                -Category "Local" `
                 -MITRE "T1562.001" `
                 -Tactic "Defense Evasion" `
                 -Source "Security-APT-AMSI-RegistryHooks" `
