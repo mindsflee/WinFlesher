@@ -1,6 +1,6 @@
 ﻿Register-WFLModule `
     -Name "LPE-ServicePermissions" `
-    -Category "Privilege Escalation" `
+    -Category "Local" `
     -Type "Check" `
     -MITRE "T1574.010" `
     -Tactic "Privilege Escalation" `
@@ -129,7 +129,7 @@ Write-Host "[+] Permissions successfully restored on the service directory." -Fo
                 Add-WFLFinding `
                     -Title "Privileged Service Folder Permission Audit passed" `
                     -Severity "Info" `
-                    -Category "Privilege Escalation" `
+                    -Category "Local" `
                     -MITRE "T1574.010" `
                     -Tactic "Privilege Escalation" `
                     -Source "LPE-ServicePermissions" `
@@ -141,7 +141,7 @@ Write-Host "[+] Permissions successfully restored on the service directory." -Fo
             Add-WFLFinding `
                 -Title "Privileged Service Folder Permission Audit" `
                 -Severity $Severity `
-                -Category "Privilege Escalation" `
+                -Category "Local" `
                 -MITRE "T1574.010" `
                 -Tactic "Privilege Escalation" `
                 -Source "LPE-ServicePermissions" `
@@ -152,7 +152,7 @@ Write-Host "[+] Permissions successfully restored on the service directory." -Fo
             Add-WFLFinding `
                 -Title "Service permission audit failed" `
                 -Severity "Info" `
-                -Category "Privilege Escalation" `
+                -Category "Local" `
                 -Source "LPE-ServicePermissions" `
                 -Evidence $_.Exception.Message
         }
