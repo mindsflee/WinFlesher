@@ -1,6 +1,6 @@
 ﻿Register-WFLModule `
     -Name "Security-APT-LateralMovement-WinRMHardening" `
-    -Category "Lateral Movement" `
+    -Category "Local" `
     -Type "Check" `
     -MITRE "T1021.006" `
     -Tactic "Lateral Movement" `
@@ -58,7 +58,7 @@ Set-Item -Path "WSMan:\localhost\Service\Auth\Basic" -Value $false; Set-Item -Pa
             Add-WFLFinding `
                 -Title "WinRM / PowerShell Remoting security exposure detected" `
                 -Severity "High" `
-                -Category "Lateral Movement" `
+                -Category "Local" `
                 -MITRE "T1021.006" `
                 -Tactic "Lateral Movement" `
                 -Source "Security-APT-LateralMovement-WinRMHardening" `
@@ -69,7 +69,7 @@ Set-Item -Path "WSMan:\localhost\Service\Auth\Basic" -Value $false; Set-Item -Pa
             Add-WFLFinding `
                 -Title "WinRM security hardening review passed" `
                 -Severity "Info" `
-                -Category "Lateral Movement" `
+                -Category "Local" `
                 -MITRE "T1021.006" `
                 -Tactic "Lateral Movement" `
                 -Source "Security-APT-LateralMovement-WinRMHardening" `
