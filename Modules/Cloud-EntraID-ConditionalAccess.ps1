@@ -16,17 +16,47 @@
         Code          = @'
 Connect-MgGraph; Update-MgConditionalAccessPolicy -PolicyId <PolicyID> -State "enabled"
 '@
-    } -Run {
+		} -Run {
+        
+        $Policies = @($Global:WinFlesher.Context.EntraIDConditionalAccessPolicies)
 
-        $Cloud = $Global:WinFlesher.Context.EntraID
+      
+        if (($null -eq $Policies -or$Policies.Count -eq 0) -and (Get-Command Get-MgConditionalAccessPolicy -ErrorAction SilentlyContinue)) {
+            try {
+                $mgCtx = Get-MgContext -ErrorAction SilentlyContinue
+                if ($mgCtx) {
+                    Import-Module Microsoft.Graph.Identity.SignIns -ErrorAction SilentlyContinue
+                    $rawPolicies = Get-MgConditionalAccessPolicy -ErrorAction Stop
+                    if ($rawPolicies) {
+                        $Policies = @($rawPolicies | ForEach-Object {
+                                $hasPrivExclusions =$false
+                                if ($_.Conditions.Users.ExcludeUsers -or$_.Conditions.Users.ExcludeRoles) {
+                                    $hasPrivExclusions =$true
+                                }
 
-        if (-not $Cloud.Available) {
+                                [PSCustomObject]@{
+                                    Id                      = $_.Id
+                                    DisplayName             = $_.DisplayName
+                                    State                   = $_.State
+                                    HasPrivilegedExclusions = $hasPrivExclusions
+                                    RawPolicy               = $_
+                                }
+                            }
+                        )
+                    }
+                }
+            }
+            catch {}
+        }
 
+     
+        if (-not $Policies -or$Policies.Count -eq 0) {
             Add-WFLFinding `
                 -Title "Conditional Access policies review unavailable" `
                 -Severity "Info" `
                 -Category "Cloud / Hybrid Identity" `
-                -Source "Cloud-EntraID-ConditionalAccess"
+                -Source "Cloud-EntraID-ConditionalAccess" `
+                -Evidence "No active Microsoft Graph session found or zero Conditional Access policies retrieved."
 
             return
         }
