@@ -1,6 +1,6 @@
 ﻿Register-WFLModule `
     -Name "ADCS-ESC11" `
-    -Category "Active Directory Certificate Services" `
+    -Category "Active Directory" `
     -Type "Check" `
     -MITRE "T1649" `
     -Tactic "Credential Access" `
@@ -23,7 +23,7 @@ Restart-Service CertSvc
             Add-WFLFinding `
                 -Title "ADCS ESC11 review unavailable" `
                 -Severity "Info" `
-                -Category "Active Directory Certificate Services" `
+                -Category "Active Directory" `
                 -Source "ADCS-ESC11" `
                 -Evidence "Active Directory discovery unavailable."
             return
@@ -88,7 +88,7 @@ Restart-Service CertSvc
             Add-WFLFinding `
                 -Title "AD CS ESC11 RPC enrollment encryption review" `
                 -Severity $Severity `
-                -Category "Active Directory Certificate Services" `
+                -Category "Active Directory" `
                 -MITRE "T1649" `
                 -Tactic "Credential Access" `
                 -Source "ADCS-ESC11" `
@@ -99,7 +99,7 @@ Restart-Service CertSvc
             Add-WFLFinding `
                 -Title "AD CS ESC11 review failed" `
                 -Severity "Info" `
-                -Category "Active Directory Certificate Services" `
+                -Category "Active Directory" `
                 -Source "ADCS-ESC11" `
                 -Evidence $_.Exception.Message
         }
