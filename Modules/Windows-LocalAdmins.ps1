@@ -1,6 +1,6 @@
 ﻿Register-WFLModule `
     -Name "Windows-LocalAdmins" `
-    -Category "Windows Security" `
+    -Category "Local" `
     -Type "Check" `
     -MITRE "T1078" `
     -Tactic "Persistence" `
@@ -12,7 +12,7 @@
         Type          = 'Specific'
         Description   = 'Remove unauthorized accounts present in the local "Administrators" group.'
         Impact        = 'Reduces the local attack surface by restricting administrative privileges to legitimate users.'
-        VariableGuide = 'Replace [Nome_Account] with the unauthorized user detected.'
+        VariableGuide = 'Replace [Account_Name] with the unauthorized user detected.'
         Code          = @'
 $localGroup = "Administrators"
 $unauthorizedAccount = "[Nome_Account]"
@@ -71,7 +71,7 @@ Write-Host "[!] Account $unauthorizedAccount removed from the local Administrato
             Add-WFLFinding `
                 -Title "Local Administrators membership review" `
                 -Severity $Severity `
-                -Category "Windows Security" `
+                -Category "Local" `
                 -MITRE "T1078" `
                 -Tactic "Persistence" `
                 -Source "Windows-LocalAdmins" `
@@ -82,7 +82,7 @@ Write-Host "[!] Account $unauthorizedAccount removed from the local Administrato
             Add-WFLFinding `
                 -Title "Unable to enumerate local administrators" `
                 -Severity "Low" `
-                -Category "Windows Security" `
+                -Category "Local" `
                 -MITRE "T1078" `
                 -Tactic "Persistence" `
                 -Source "Windows-LocalAdmins" `
