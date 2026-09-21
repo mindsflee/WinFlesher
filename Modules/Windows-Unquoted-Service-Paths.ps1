@@ -14,7 +14,7 @@
         Impact        = 'Prevents arbitrary code execution via service path binary hijacking.'
         VariableGuide = 'Set [Service_Name] to the vulnerable service identified.'
         Code          = @'
-$serviceName = "[Nome_Servizio]"
+$serviceName = "[Service_Name]"
 $service = Get-WmiObject Win32_Service -Filter "Name='$serviceName'"
 $fixedPath = "`"" + $service.PathName.Trim('"') + "`""
 Set-WmiInstance -Class Win32_Service -Filter "Name='$serviceName'" -Arguments @{PathName = $fixedPath}
