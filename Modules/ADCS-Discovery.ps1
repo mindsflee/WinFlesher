@@ -1,6 +1,6 @@
 ﻿Register-WFLModule `
     -Name "ADCS-Discovery" `
-    -Category "Active Directory Certificate Services" `
+    -Category "Active Directory" `
     -Type "Check" `
     -MITRE "T1590.001" `
     -Tactic "Discovery" `
@@ -24,7 +24,7 @@ Write-Host "[!] Certificate template $templateName disabled/secured." -Foregroun
             Add-WFLFinding `
                 -Title "AD CS discovery unavailable" `
                 -Severity "Info" `
-                -Category "Active Directory Certificate Services" `
+                -Category "Active Directory" `
                 -Source "ADCS-Discovery" `
                 -Evidence "Active Directory discovery unavailable." `
                 -Recommendation "Run from a domain-joined host with RSAT ActiveDirectory module."
@@ -62,7 +62,7 @@ Write-Host "[!] Certificate template $templateName disabled/secured." -Foregroun
             Add-WFLFinding `
                 -Title "AD CS discovery review" `
                 -Severity $Severity `
-                -Category "Active Directory Certificate Services" `
+                -Category "Active Directory" `
                 -Source "ADCS-Discovery" `
                 -Evidence "EnterpriseCAs=$($CAs.Count); CertificateTemplates=$($Templates.Count)" `
                 -Recommendation "Review published CAs and certificate templates. Use Show-WFLDetails -Name ADCS-Discovery-CAs and Show-WFLDetails -Name ADCS-Discovery-Templates."
@@ -71,7 +71,7 @@ Write-Host "[!] Certificate template $templateName disabled/secured." -Foregroun
             Add-WFLFinding `
                 -Title "AD CS discovery failed" `
                 -Severity "Info" `
-                -Category "Active Directory Certificate Services" `
+                -Category "Active Directory" `
                 -Source "ADCS-Discovery" `
                 -Evidence $_.Exception.Message `
                 -Recommendation "Verify RSAT ActiveDirectory module and permissions."
