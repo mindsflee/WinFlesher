@@ -285,8 +285,9 @@ function Update-WFL {
         Write-WFLLog "Backup created: $BackupZip" "OK"
 
         #
-        # DYNAMIC UPDATE
-
+        # DYNAMIC UPDATE (CORRECTED & CLEAN REPLACEMENT)
+        # Sostituisce i file e le cartelle esistenti senza nidificarli.
+        #
 
         $ExcludedItems = @(
             "Backup",
@@ -305,12 +306,12 @@ function Update-WFL {
             $TargetItemPath = Join-Path $BasePath $Item.Name
 
             if ($Item.PSIsContainer) {
-               
+                # Se è una cartella, assicuriamoci che esista nel target e copiamo il contenuto interno
                 if (-not (Test-Path -LiteralPath $TargetItemPath)) {
                     New-Item -ItemType Directory -Path $TargetItemPath -Force | Out-Null
                 }
 
-              
+                # Copia il contenuto interno della cartella sorgente dentro la cartella di destinazione esistente
                 Get-ChildItem -LiteralPath $Item.FullName -Force | ForEach-Object {
                     Copy-Item `
                         -LiteralPath $_.FullName `
@@ -323,7 +324,7 @@ function Update-WFL {
                 Write-WFLLog "Updated folder: $($Item.Name)" "OK"
             }
             else {
-              
+                # Se è un file singolo, lo sovrascriviamo direttamente
                 Copy-Item `
                     -LiteralPath $Item.FullName `
                     -Destination $TargetItemPath `
@@ -601,7 +602,7 @@ function Invoke-WFLModule {
         Add-WFLFinding `
             -Title "Module execution failed: $($Module.Name)" `
             -Severity "Medium" `
-            -Category "Framework" `
+            -Category "Execution Failed" `
             -Source $Module.Name `
             -Evidence $_.Exception.Message `
             -Recommendation "Review module code, permissions, and discovery context."
