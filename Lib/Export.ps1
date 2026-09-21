@@ -190,21 +190,35 @@ function New-WFLScoreDonut {
 "@
     }
 
-  Write-Verbose "Retrieving Active Directory, Cloud, and Local scores from Core..."
+    function Get-WFLSafeCategoryScore {
+        param($CategoryData)
+        if ($null -eq $CategoryData -or $null -eq $CategoryData.Score) {
+            return [PSCustomObject]@{ Value = "N/A"; Color = "#475569"; Svg = (New-WFLScoreDonut -Value 0 -Color "#475569") }
+        }
+        $val = [double]$CategoryData.Score
+        $col = Get-WFLScoreColor -Value $val
+        return [PSCustomObject]@{ Value = $val; Color = $col; Svg = (New-WFLScoreDonut -Value $val -Color $col) }
+    }
+
+Write-Verbose "Retrieving Active Directory, Cloud, and Local scores from Core..."
 
 $CategoryScores = Get-WFLScore -Type All
 
-$ADScoreVal    = [double]$CategoryScores.ActiveDirectory.Score
-$CloudScoreVal = [double]$CategoryScores.Cloud.Score
-$LocalScoreVal = [double]$CategoryScores.Local.Score
+$ADScore    = Get-WFLSafeCategoryScore -CategoryData $CategoryScores.ActiveDirectory
+$CloudScore = Get-WFLSafeCategoryScore -CategoryData $CategoryScores.Cloud
+$LocalScore = Get-WFLSafeCategoryScore -CategoryData $CategoryScores.Local
 
-    $ADScoreColor    = Get-WFLScoreColor -Value $ADScoreVal
-    $CloudScoreColor = Get-WFLScoreColor -Value $CloudScoreVal
-    $LocalScoreColor = Get-WFLScoreColor -Value $LocalScoreVal
+$ADScoreVal    = $ADScore.Value
+$ADScoreColor  = $ADScore.Color
+$ADSvgChart    = $ADScore.Svg
 
-    $ADSvgChart    = New-WFLScoreDonut -Value $ADScoreVal    -Color $ADScoreColor
-    $CloudSvgChart = New-WFLScoreDonut -Value $CloudScoreVal -Color $CloudScoreColor
-    $LocalSvgChart = New-WFLScoreDonut -Value $LocalScoreVal -Color $LocalScoreColor
+$CloudScoreVal   = $CloudScore.Value
+$CloudScoreColor = $CloudScore.Color
+$CloudSvgChart   = $CloudScore.Svg
+
+$LocalScoreVal   = $LocalScore.Value
+$LocalScoreColor = $LocalScore.Color
+$LocalSvgChart   = $LocalScore.Svg
 
     Write-Verbose "Assembling final HTML template..."
     $Html = @"
