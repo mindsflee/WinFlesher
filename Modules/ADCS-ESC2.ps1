@@ -1,6 +1,6 @@
 ﻿Register-WFLModule `
     -Name "ADCS-ESC2" `
-    -Category "Active Directory Certificate Services" `
+    -Category "Active Directory" `
     -Type "Check" `
     -MITRE "T1649" `
     -Tactic "Credential Access" `
@@ -21,7 +21,7 @@
             Add-WFLFinding `
                 -Title "ADCS ESC2 review unavailable" `
                 -Severity "Info" `
-                -Category "Active Directory Certificate Services" `
+                -Category "Active Directory" `
                 -Source "ADCS-ESC2" `
                 -Evidence "Active Directory discovery unavailable."
             return
@@ -124,7 +124,7 @@
             Add-WFLFinding `
                 -Title "AD CS ESC2 Any Purpose EKU review" `
                 -Severity $Severity `
-                -Category "Active Directory Certificate Services" `
+                -Category "Active Directory" `
                 -MITRE "T1649" `
                 -Tactic "Credential Access" `
                 -Source "ADCS-ESC2" `
@@ -135,7 +135,7 @@
             Add-WFLFinding `
                 -Title "AD CS ESC2 review failed" `
                 -Severity "Info" `
-                -Category "Active Directory Certificate Services" `
+                -Category "Active Directory" `
                 -Source "ADCS-ESC2" `
                 -Evidence $_.Exception.Message
         }
