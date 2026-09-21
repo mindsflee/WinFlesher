@@ -62,10 +62,10 @@ function Export-WFLReportHtml {
     Write-Verbose "Converting data fragments to HTML..."
     $SummaryHtml  = $Summary | ConvertTo-Html -Fragment
     
-    $FindingsRows = foreach ($f in $Findings) {
-        $sevClass = "sev-$($f.Severity.ToLower())"
-        "<tr><td>$($f.Time)</td><td class='$sevClass'><b>$($f.Severity)</b></td><td>$($f.Category)</td><td>$($f.MITRE)</td><td>$($f.Tactic)</td><td>$($f.Impact)</td><td>$($f.Title)</td><td>$($f.Evidence)</td><td>$($f.Recommendation)</td><td>$($f.Source)</td></tr>"
-    }
+   $FindingsRows = foreach ($f in $Findings) {
+    $sevClass = "sev-$($f.Severity.ToLower())"
+    "<tr><td>$($f.Time)</td><td class='$sevClass'><b>$($f.Severity)</b></td><td><b>$($f.Category)</b></td><td>$($f.MITRE)</td><td>$($f.Tactic)</td><td>$($f.Impact)</td><td>$($f.Title)</td><td>$($f.Evidence)</td><td>$($f.Recommendation)</td><td>$($f.Source)</td></tr>"
+}
     $FindingsHtml = "<div class='table-responsive'><table><thead><tr><th>Time</th><th>Severity</th><th>Category</th><th>MITRE</th><th>Tactic</th><th>Impact</th><th>Title</th><th>Evidence</th><th>Recommendation</th><th>Source</th></tr></thead><tbody>" + ($FindingsRows -join "`n") + "</tbody></table></div>"
 
     $ModulesHtml  = $Modules | ConvertTo-Html -Fragment
