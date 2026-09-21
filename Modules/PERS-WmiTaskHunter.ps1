@@ -1,6 +1,6 @@
 ﻿Register-WFLModule `
     -Name "PERS-WmiTaskHunter" `
-    -Category "Persistence" `
+    -Category "Local" `
     -Type "Check" `
     -MITRE "T1546.003" `
     -Tactic "Persistence" `
@@ -54,7 +54,7 @@
             Add-WFLFinding `
                 -Title "Persistence Mechanisms Review (WMI & Scheduled Tasks)" `
                 -Severity $Severity `
-                -Category "Persistence" `
+                -Category "Local" `
                 -MITRE "T1546.003" `
                 -Tactic "Persistence" `
                 -Source "PERS-WmiTaskHunter" `
