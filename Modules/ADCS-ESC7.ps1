@@ -1,6 +1,6 @@
 ﻿Register-WFLModule `
     -Name "ADCS-ESC7" `
-    -Category "Active Directory Certificate Services" `
+    -Category "Active Directory" `
     -Type "Check" `
     -MITRE "T1649" `
     -Tactic "Credential Access" `
@@ -99,7 +99,7 @@ elseif (($ExposedCAs | Where-Object {$_.Severity -eq "Medium"}).Count -gt 0)
             Add-WFLFinding `
                 -Title "AD CS ESC7 CA Management Exposure Review" `
                 -Severity $Severity `
-                -Category "Active Directory Certificate Services" `
+                -Category "Active Directory" `
                 -MITRE "T1649" `
                 -Tactic "Credential Access" `
                 -Source "ADCS-ESC7" `
@@ -107,7 +107,7 @@ elseif (($ExposedCAs | Where-Object {$_.Severity -eq "Medium"}).Count -gt 0)
                 -Recommendation "Remove ManageCA, ManageCertificates, WriteDacl, and WriteOwner rights on CA objects from unprivileged users and groups."
         }
         catch {
-            Add-WFLFinding -Title "ADCS ESC7 review failed" -Severity "Info" -Category "Active Directory Certificate Services" -Source "ADCS-ESC7" -Evidence $_.Exception.Message
+            Add-WFLFinding -Title "ADCS ESC7 review failed" -Severity "Info" -Category "Active Directory" -Source "ADCS-ESC7" -Evidence $_.Exception.Message
         }
     }
 
