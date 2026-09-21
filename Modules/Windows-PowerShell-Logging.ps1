@@ -1,6 +1,6 @@
 ﻿Register-WFLModule `
     -Name "Windows-PowerShell-Logging" `
-    -Category "Logging" `
+    -Category "Local" `
     -Type "Check" `
     -MITRE "T1059.001" `
     -Tactic "Execution" `
@@ -53,7 +53,7 @@ New-Item -Path "HKLM:\SOFTWARE\Policies\Microsoft\Windows\PowerShell\ScriptBlock
             Add-WFLFinding `
                 -Title "PowerShell logging coverage gaps detected" `
                 -Severity "Low" `
-                -Category "Logging" `
+                -Category "Local" `
                 -MITRE "T1059.001" `
                 -Tactic "Execution" `
                 -Source "Windows-PowerShell-Logging" `
@@ -65,7 +65,7 @@ New-Item -Path "HKLM:\SOFTWARE\Policies\Microsoft\Windows\PowerShell\ScriptBlock
             Add-WFLFinding `
                 -Title "PowerShell logging review passed" `
                 -Severity "Info" `
-                -Category "Logging" `
+                -Category "Local" `
                 -MITRE "T1059.001" `
                 -Tactic "Execution" `
                 -Source "Windows-PowerShell-Logging" `
