@@ -1,6 +1,6 @@
 ﻿Register-WFLModule `
     -Name "Security-APT-Network-InsecureProtocols" `
-    -Category "Network Security" `
+    -Category "Local" `
     -Type "Check" `
     -MITRE "T1557" `
     -Tactic "Credential Access" `
@@ -62,7 +62,7 @@ Set-ItemProperty -Path "HKLM:\SYSTEM\CurrentControlSet\Services\NetBT\Parameters
             Add-WFLFinding `
                 -Title "LLMNR or NetBIOS name resolution protocols enabled" `
                 -Severity "Medium" `
-                -Category "Network Security" `
+                -Category "Local" `
                 -MITRE "T1557" `
                 -Tactic "Credential Access" `
                 -Source "Security-APT-Network-InsecureProtocols" `
@@ -73,7 +73,7 @@ Set-ItemProperty -Path "HKLM:\SYSTEM\CurrentControlSet\Services\NetBT\Parameters
             Add-WFLFinding `
                 -Title "LLMNR and NetBIOS broadcast protocol review passed" `
                 -Severity "Info" `
-                -Category "Network Security" `
+                -Category "Local" `
                 -MITRE "T1557" `
                 -Tactic "Credential Access" `
                 -Source "Security-APT-Network-InsecureProtocols" `
